@@ -1123,6 +1123,33 @@
     </copy>
   </target>
 
+  <!-- ======== -->
+  <!-- Datagrid -->
+  <!-- ======== -->
+
+  <target name="_module-datagrid-most">
+      <property name="_module.name" value="datagrid" override="true"/>
+      <property name="_module.output" override="true" value="${project.root}/${_module.name}/output"/>
+      <property name="_module.root" value="${project.root}/extras/datagrid"/>
+      
+      <!-- Create the module root directory -->
+      <mkdir dir="${_module.root}"/>
+
+      <!-- Define the directory structure of the module -->
+      <property name="_module.lib" value="${_module.root}/lib"/>
+      <property name="_module.deploy" value="${_module.root}/deploy"/>
+      <property name="_module.deployers" value="${_module.root}/deployers"/>
+      <property name="_module.conf" value="${_module.root}/conf"/>
+
+      <mkdir dir="${_module.lib}"/>
+      <mkdir dir="${_module.deploy}"/>
+      <mkdir dir="${_module.deployers}"/>
+      <mkdir dir="${_module.conf}"/>
+
+  </target>
+
+  <target name="_module-datagrid-all"></target>
+
   <!-- ===== -->
   <!-- Varia -->
   <!-- ===== -->
