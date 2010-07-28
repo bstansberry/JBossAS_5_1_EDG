@@ -1933,6 +1933,14 @@
       <artifactId>jgroups</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-server-memcached</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-server-memcached</artifactId>
+    </dependency>
+    <dependency>
       <groupId>joesnmp</groupId>
       <artifactId>joesnmp</artifactId>
     </dependency>

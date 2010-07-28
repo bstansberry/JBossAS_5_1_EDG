@@ -12,7 +12,7 @@
 <!--                                                                        -->
 <!-- ====================================================================== -->
 
-<!-- $Id: build.xml 106948 2010-07-20 18:57:05Z fnasser@redhat.com $ -->
+<!-- $Id$ -->
 
 <project default="main" name="JBoss/Build">
 
@@ -120,7 +120,6 @@ Please ensure that build.properties exists in the build dir of the checkout tree
       <module name="cluster"/>
       <module name="connector"/>
       <module name="console"/>
-      <module name="datagrid"/>
       <module name="deployment"/>
       <module name="ejb3"/>
       <module name="embedded"/>
@@ -185,8 +184,7 @@ Please ensure that build.properties exists in the build dir of the checkout tree
                           webservices,
                           hibernate-int,
                           console,
-                          spring-int,
-                          datagrid
+                          spring-int
                           "/>
       </group>
 
@@ -612,18 +610,6 @@ Please ensure that build.properties exists in the build dir of the checkout tree
 
   <target name="_module-cluster-all" depends="_module-cluster-most">
      <ant antfile="build-distr.xml" target="_module-cluster-all"/>
-  </target>
-
-  <!-- ======== -->
-  <!-- Datagrid -->
-  <!-- ======== -->
-
-  <target name="_module-datagrid-most">
-     <ant antfile="build-distr.xml" target="_module-datagrid-most"/>
-  </target>
-
-  <target name="_module-datagrid-all" depends="_module-datagrid-most">
-     <ant antfile="build-distr.xml" target="_module-datagrid-all"/>
   </target>
 
   <!-- ===== -->

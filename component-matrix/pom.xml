@@ -31,6 +31,7 @@
   <!-- Properties -->
   <properties>
     <version.apache.xalan>2.7.1.patch02</version.apache.xalan>
+    <version.org.infinispan>4.1.0.CR2</version.org.infinispan>
     <version.jacorb>2.3.1jboss.patch01</version.jacorb>
     <version.javax.faces>1.2_13</version.javax.faces>
     <version.jboss.jaxr>2.0.1</version.jboss.jaxr>
@@ -1082,7 +1083,19 @@
         <artifactId>jgroups</artifactId>
         <version>${version.jgroups}</version>
       </dependency>
-      
+
+      <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-server-memcached</artifactId>
+        <version>${version.org.infinispan}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-server-hotrod</artifactId>
+        <version>${version.org.infinispan}</version>
+      </dependency>
+           
       <dependency>
         <groupId>joesnmp</groupId>
         <artifactId>joesnmp</artifactId>
@@ -1703,6 +1716,14 @@
           <exclusion>
             <groupId>jgroups</groupId>
             <artifactId>jgroups</artifactId>            
+          </exclusion>
+          <exclusion>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-server-memcached</artifactId>
+          </exclusions>
+          <exclusion>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-server-hotrod</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

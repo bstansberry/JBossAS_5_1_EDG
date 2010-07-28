@@ -1089,8 +1089,10 @@
     </fileset>
     </copy>
 
-  	<!-- Create the ec2 and mod_cluster-ec2 installers -->
+    <!-- Create extras directory for ec2 and datagrid -->
     <mkdir dir="${install.root}/extras"/>
+
+  	<!-- Create the ec2 and mod_cluster-ec2 installers -->
     <copy todir="${install.root}/extras">
       <fileset dir="${_module.output}/installers">
         <include name="**"/>
@@ -1102,7 +1104,65 @@
         <include name="**"/>
       </fileset>
     </copy>
-  	 
+
+    <!-- Create directory structure for datagrid profile -->
+
+    <mkdir dir="${install.root}/extras/datagrid"/>
+    <property name="_datagrid.root" value="${install.root}/extras/datagrid"/>
+
+    <mkdir dir="${_datagrid.root}/deploy"/>
+    <mkdir dir="${_datagrid.root}/deployers"/>
+    <mkdir dir="${_datagrid.root}/conf"/>
+    <mkdir dir="${_datagrid.root}/lib"/>
+
+    <property name="_datagrid.deploy" value="${_datagrid.root}/deploy"/>
+    <property name="_datagrid.deployers" value="${_datagrid.root}/deployers"/>
+    <property name="_datagrid.conf" value="${_datagrid.root}/conf"/>
+    <property name="_datagrid.lib" value="${_datagrid.root}/lib"/>
+
+    <!-- Copy in the files needed for the conf directory -->
+
+    <copy todir="${_datagrid.conf}" overwrite="true">
+        <!-- Copying other filesets as per the minimal profile -->
+        <fileset dir="${install.root}/server/all/conf">
+            <include name="jndi.properties"/>
+            <include name="jboss-log4j.xml"/>
+            <exclude name="jboss-log4j-production.xml"/>
+            <include name="bootstrap/classloader.xml"/>
+            <include name="bootstrap/aop.xml"/>
+            <include name="bootstrap/jmx.xml"/>
+            <include name="bootstrap/deployers.xml"/>
+            <include name="bootstrap/profile.xml"/>
+            <include name="bootstrap/security.xml"/>
+            <include name="xmdesc/NamingBean-xmbean.xml"/>
+            <include name="xmdesc/NamingService-xmbean.xml"/>
+            <include name="xmdesc/NamingProviderURLWriter-xmbean.xml"/>
+            <include name="xmdesc/Log4jService-xmbean.xml"/>          
+        </fileset>
+        <fileset dir="${project.root}/server/output/etc/conf/minimal"/>
+
+       <!-- <fileset dir="${project.root}/cluster/src/installers/datagrid"/> -->
+    </copy>
+    
+    <copy todir="${_datagrid.lib}">
+      <fileset dir="${install.all.lib}">
+        <include name="jnpserver.jar" />
+        <include name="log4j.jar" />
+      </fileset>
+    </copy>
+
+    <copy file="${project.root}/profileservice/output/resources/hdscanner-jboss-beans.xml" 
+          todir="${_datagrid.deploy}" overwrite="true"/>
+
+    <move todir="${_datagrid.conf}" overwrite="true">
+        <fileset dir="${_datagrid.root}">
+            <include name="datagrid-jboss-beans.xml"/>
+            <include name="datagrid-endpoint-memcached.properties"/>
+            <include name="datagrid-endpoint-hotrod.properties"/>
+            <include name="infinispan-configuration.xml"/>
+        </fileset>           
+    </move>
+          
   </target>
 
   <target name="_module-cluster-all" depends="_module-cluster-most">
@@ -1123,32 +1183,6 @@
     </copy>
   </target>
 
-  <!-- ======== -->
-  <!-- Datagrid -->
-  <!-- ======== -->
-
-  <target name="_module-datagrid-most">
-      <property name="_module.name" value="datagrid" override="true"/>
-      <property name="_module.output" override="true" value="${project.root}/${_module.name}/output"/>
-      <property name="_module.root" value="${project.root}/extras/datagrid"/>
-      
-      <!-- Create the module root directory -->
-      <mkdir dir="${_module.root}"/>
-
-      <!-- Define the directory structure of the module -->
-      <property name="_module.lib" value="${_module.root}/lib"/>
-      <property name="_module.deploy" value="${_module.root}/deploy"/>
-      <property name="_module.deployers" value="${_module.root}/deployers"/>
-      <property name="_module.conf" value="${_module.root}/conf"/>
-
-      <mkdir dir="${_module.lib}"/>
-      <mkdir dir="${_module.deploy}"/>
-      <mkdir dir="${_module.deployers}"/>
-      <mkdir dir="${_module.conf}"/>
-
-  </target>
-
-  <target name="_module-datagrid-all"></target>
 
   <!-- ===== -->
   <!-- Varia -->
