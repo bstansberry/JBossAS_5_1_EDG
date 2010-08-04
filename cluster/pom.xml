@@ -167,6 +167,16 @@
       <groupId>org.jboss.remoting</groupId>
       <artifactId>jboss-remoting</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-server-memcached</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-server-hotrod</artifactId>
+    </dependency>
     
   </dependencies>
   

@@ -1938,7 +1938,7 @@
     </dependency>
     <dependency>
       <groupId>org.infinispan</groupId>
-      <artifactId>infinispan-server-memcached</artifactId>
+      <artifactId>infinispan-server-hotrod</artifactId>
     </dependency>
     <dependency>
       <groupId>joesnmp</groupId>

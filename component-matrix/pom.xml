@@ -1720,7 +1720,7 @@
           <exclusion>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-server-memcached</artifactId>
-          </exclusions>
+          </exclusion>
           <exclusion>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-server-hotrod</artifactId>

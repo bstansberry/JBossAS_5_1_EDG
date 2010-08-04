@@ -1141,15 +1141,17 @@
         </fileset>
         <fileset dir="${project.root}/server/output/etc/conf/minimal"/>
 
-       <!-- <fileset dir="${project.root}/cluster/src/installers/datagrid"/> -->
     </copy>
     
     <copy todir="${_datagrid.lib}">
-      <fileset dir="${install.all.lib}">
-        <include name="jnpserver.jar" />
-        <include name="log4j.jar" />
-      </fileset>
+         <fileset dir="${org.infinispan.lib}" excludes="*-sources.jar"></fileset>
+         <fileset dir="${org.jgroups.lib}" excludes="*-sources.jar"></fileset>
+         <fileset dir="${org.jboss.netty.lib}" excludes="*-sources.jar"></fileset>
+         <fileset dir="${apache.log4j.lib}" includes="log4j.jar"></fileset>
+         <fileset dir="${jboss.jnpserver.lib}" includes="*jnpserver.jar"></fileset>
     </copy>
+
+
 
     <copy file="${project.root}/profileservice/output/resources/hdscanner-jboss-beans.xml" 
           todir="${_datagrid.deploy}" overwrite="true"/>
@@ -1162,7 +1164,7 @@
             <include name="infinispan-configuration.xml"/>
         </fileset>           
     </move>
-          
+
   </target>
 
   <target name="_module-cluster-all" depends="_module-cluster-most">
