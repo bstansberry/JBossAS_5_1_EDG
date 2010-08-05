@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== -->
+<!--                                                                        -->
+<!--  JBoss, the OpenSource J2EE webOS                                      -->
+<!--                                                                        -->
+<!--  Distributable under LGPL license.                                     -->
+<!--  See terms of license at http://www.gnu.org.                           -->
+<!--                                                                        -->
+<!-- ====================================================================== -->
+
+
+<project default="main" name="JBoss - build file for datagrid profile">
+
+    <target name="install">
+        <property name="server.datagrid" value="../../server/datagrid"/>
+        <property name="datagrid.deploy" value="${server.datagrid}/deploy"/>
+        <property name="datagrid.conf" value="${server.datagrid}/conf"/>
+        <property name="datagrid.deployers" value="${server.datagrid}/deployers"/>
+        <property name="datagrid.lib" value="${server.datagrid}/lib"/>
+
+        <mkdir dir="${server.datagrid}"/>
+        <mkdir dir="${datagrid.deploy}"/>
+        <mkdir dir="${datagrid.conf}"/>
+        <mkdir dir="${datagrid.deployers}"/>
+        <mkdir dir="${datagrid.lib}"/>
+
+        <copy todir="{datagrid.conf}"/>
+            <fileset dir="./conf"/>
+        </copy>
+
+        <copy todir="{datagrid.deploy}"/>
+            <fileset dir="./deploy"/>
+        </copy>
+        
+        <copy todir="{datagrid.deployers}"/>
+            <fileset dir="./deployers"/>
+        </copy>
+
+        <copy todir="{datagrid.lib}"/>
+            <fileset dir="./lib"/>
+        </copy>
+    </target>
+
+
+</project>
+

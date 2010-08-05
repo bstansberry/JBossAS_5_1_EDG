@@ -1153,8 +1153,8 @@
 
 
 
-    <copy file="${project.root}/profileservice/output/resources/hdscanner-jboss-beans.xml" 
-          todir="${_datagrid.deploy}" overwrite="true"/>
+<!--    <copy file="${project.root}/profileservice/output/resources/hdscanner-jboss-beans.xml" 
+          todir="${_datagrid.deploy}" overwrite="true"/> -->
 
     <move todir="${_datagrid.conf}" overwrite="true">
         <fileset dir="${_datagrid.root}">
