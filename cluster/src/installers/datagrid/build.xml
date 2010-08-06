@@ -13,7 +13,8 @@
 <project default="main" name="JBoss - build file for datagrid profile">
 
     <target name="install">
-        <property name="server.datagrid" value="../../server/datagrid"/>
+        <property name="jboss.home" value="../../"/>
+        <property name="server.datagrid" value="${jboss.home}/server/datagrid"/>
         <property name="datagrid.deploy" value="${server.datagrid}/deploy"/>
         <property name="datagrid.conf" value="${server.datagrid}/conf"/>
         <property name="datagrid.deployers" value="${server.datagrid}/deployers"/>
@@ -25,20 +26,24 @@
         <mkdir dir="${datagrid.deployers}"/>
         <mkdir dir="${datagrid.lib}"/>
 
-        <copy todir="{datagrid.conf}"/>
+        <copy todir="${datagrid.conf}">
             <fileset dir="./conf"/>
+            <fileset dir="${jboss.home}/server/minimal/conf"/>
         </copy>
 
-        <copy todir="{datagrid.deploy}"/>
+        <copy todir="${datagrid.deploy}">
             <fileset dir="./deploy"/>
+            <fileset dir="${jboss.home}/server/minimal/deploy"/>
         </copy>
         
-        <copy todir="{datagrid.deployers}"/>
+        <copy todir="${datagrid.deployers}">
             <fileset dir="./deployers"/>
+            <fileset dir="${jboss.home}/server/minimal/deployers"/>
         </copy>
 
-        <copy todir="{datagrid.lib}"/>
+        <copy todir="${datagrid.lib}">
             <fileset dir="./lib"/>
+            <fileset dir="${jboss.home}/server/minimal/lib"/>
         </copy>
     </target>
 

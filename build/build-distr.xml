@@ -1120,28 +1120,11 @@
     <property name="_datagrid.conf" value="${_datagrid.root}/conf"/>
     <property name="_datagrid.lib" value="${_datagrid.root}/lib"/>
 
-    <!-- Copy in the files needed for the conf directory -->
+    <!-- ================================================================================================================================= -->
+    <!-- NOTE: Other jar files and configuration files defined by the MINIMAL profile will be copied when extras/datagrid/build.xml is run -->
+    <!-- ================================================================================================================================= -->
 
-    <copy todir="${_datagrid.conf}" overwrite="true">
-        <!-- Copying other filesets as per the minimal profile -->
-        <fileset dir="${install.root}/server/all/conf">
-            <include name="jndi.properties"/>
-            <include name="jboss-log4j.xml"/>
-            <exclude name="jboss-log4j-production.xml"/>
-            <include name="bootstrap/classloader.xml"/>
-            <include name="bootstrap/aop.xml"/>
-            <include name="bootstrap/jmx.xml"/>
-            <include name="bootstrap/deployers.xml"/>
-            <include name="bootstrap/profile.xml"/>
-            <include name="bootstrap/security.xml"/>
-            <include name="xmdesc/NamingBean-xmbean.xml"/>
-            <include name="xmdesc/NamingService-xmbean.xml"/>
-            <include name="xmdesc/NamingProviderURLWriter-xmbean.xml"/>
-            <include name="xmdesc/Log4jService-xmbean.xml"/>          
-        </fileset>
-        <fileset dir="${project.root}/server/output/etc/conf/minimal"/>
-
-    </copy>
+    <!-- Copy the jar files needed for the datagrid profile -->
     
     <copy todir="${_datagrid.lib}">
          <fileset dir="${org.infinispan.lib}" excludes="*-sources.jar"></fileset>
@@ -1151,11 +1134,8 @@
          <fileset dir="${jboss.jnpserver.lib}" includes="*jnpserver.jar"></fileset>
     </copy>
 
-
-
-<!--    <copy file="${project.root}/profileservice/output/resources/hdscanner-jboss-beans.xml" 
-          todir="${_datagrid.deploy}" overwrite="true"/> -->
-
+    <!-- The configuration files below get built automatically into the extras/datagrid directory.
+         We simply want to move them over into the config directory within extras/datagrid-->    
     <move todir="${_datagrid.conf}" overwrite="true">
         <fileset dir="${_datagrid.root}">
             <include name="datagrid-jboss-beans.xml"/>
