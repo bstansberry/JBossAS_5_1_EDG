@@ -52,6 +52,7 @@ import org.jboss.logging.Logger;
 import org.jboss.resource.JBossResourceException;
 import org.jboss.resource.connectionmanager.xa.XAResourceWrapperImpl;
 import org.jboss.tm.LastResource;
+import org.jboss.tm.TransactionLocal;
 import org.jboss.tm.TransactionTimeoutConfiguration;
 import org.jboss.tm.TxUtils;
 import org.jboss.util.NestedRuntimeException;
@@ -434,6 +435,29 @@ public class TxConnectionManager extends BaseConnectionManager2 implements TxCon
          {
             cls.add(cl);
             cl.enlist();
+            if(!isInterleaving())
+            {
+            	cl.setTrackByTx(true);
+            	InternalManagedConnectionPool imcp = (InternalManagedConnectionPool)cl.getContext();
+            	JBossManagedConnectionPool.SubPoolContext subPool = imcp.getSubPoolContext();
+            	TransactionLocal trackByTx = subPool.getTrackByTx();
+            	try
+            	{
+            		trackByTx.lock();
+            	}
+            	catch (Throwable t)
+                {
+            		rethrowAsSystemException("Unable to begin transaction with JCA lazy enlistment scenario", trackByTx.getTransaction(), t);
+                }            	
+            	try
+            	{
+            		trackByTx.set(cl);
+            	}
+            	finally
+            	{
+            		trackByTx.unlock();
+            	}
+            }
          }
       }
    }

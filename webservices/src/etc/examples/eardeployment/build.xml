@@ -59,6 +59,7 @@ To run the example, set JBOSS_HOME and run ant (with no parameters)
   <target name="cxf-stack-classpath" if="cxf-stack">
     <path id="ws.stack.classpath">
       <pathelement location="${jboss.client}/jbossws-cxf-client.jar"/>
+      <pathelement location="${jboss.client}/jboss-javaee.jar"/>
     </path>
   </target>
 

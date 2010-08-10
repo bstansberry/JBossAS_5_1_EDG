@@ -36,7 +36,7 @@ import org.jboss.system.ServiceMBean;
  * @version $Revision: 62320 $
  * @since 09-Sep-2004
  */
-public interface DatabasePersistencePolicyMBean extends ServiceMBean, PersistencePolicy
+public interface DatabasePersistencePolicyMBean extends ServiceMBean, PersistencePolicyExt
 {
    /** The default object name */
    ObjectName OBJECT_NAME = ObjectNameFactory.create("jboss.ejb:service=EJBTimerService,persistencePolicy=database");

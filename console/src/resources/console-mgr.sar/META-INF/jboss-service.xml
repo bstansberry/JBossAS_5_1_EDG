@@ -25,9 +25,11 @@
       <attribute name="JndiName">console/PluginManager</attribute>
    </mbean>
 
+<!-- Commented out due to JBPAPP-4719. Use at your own risk.
    <mbean code="org.jboss.console.manager.DeploymentFileRepository"
       name="jboss.admin:service=DeploymentFileRepository">
       <attribute name="BaseDir">./deploy/management</attribute>
    </mbean>
+-->
 
 </server>

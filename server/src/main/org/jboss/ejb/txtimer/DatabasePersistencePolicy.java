@@ -238,6 +238,27 @@ public class DatabasePersistencePolicy extends ServiceMBeanSupport
          log.warn("Unable to clear timers", e);
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void updateNextTimeout(String timerId, TimedObjectId timedObjectId, Date nextTimeout)
+   {
+      try
+      {
+         if (this.dbpPlugin instanceof UpdateableDatabasePersistencePlugin)
+         {
+            ((UpdateableDatabasePersistencePlugin) this.dbpPlugin).updateNextTimeout(timerId, timedObjectId, nextTimeout);
+         }
+      }
+      catch (SQLException sqle)
+      {
+         log.error("Could not update the next timeout date for timer: " + timerId + " timedObjectId: " + timedObjectId,
+               sqle);
+      }
+      
+   }
 
    /** Re-read the current persistent timers list, clear the db of timers,
     * and restore the timers.

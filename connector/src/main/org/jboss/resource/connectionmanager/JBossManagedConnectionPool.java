@@ -562,7 +562,7 @@ public class JBossManagedConnectionPool extends ServiceMBeanSupport
       public SubPoolContext(TransactionManager tm, ManagedConnectionFactory mcf, ConnectionListenerFactory clf, Subject subject,
                             ConnectionRequestInfo cri, PoolParams poolParams, JBossManagedConnectionPool jmcp, Logger log)
       {
-         subPool = new InternalManagedConnectionPool(mcf, clf, subject, cri, poolParams, jmcp, log);
+         subPool = new InternalManagedConnectionPool(mcf, clf, subject, cri, poolParams, jmcp, this, log);
          if (tm != null)
             trackByTx = new TransactionLocal(tm);
       }

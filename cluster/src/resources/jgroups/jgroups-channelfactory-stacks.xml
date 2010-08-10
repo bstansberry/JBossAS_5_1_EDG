@@ -7,7 +7,7 @@
 		<UDP
 		     singleton_name="shared-udp"
 		     mcast_port="${jboss.jgroups.udp.mcast_port:45688}"
-		     mcast_addr="${jboss.jgroups.udp.mcast_addr,jboss.partition.udpGroup:228.11.11.11}"
+		     mcast_addr="${jboss.jgroups.udp.mcast_addr:228.11.11.11}"
            bind_port="${jboss.jgroups.udp.bind_port:55200}"
 		     tos="8"
 		     ucast_recv_buf_size="20000000"
@@ -108,7 +108,7 @@
           <UDP
              singleton_name="udp-async"
              mcast_port="${jboss.jgroups.udp_async.mcast_port:45689}"
-             mcast_addr="${jboss.jgroups.udp_async.mcast_addr,jboss.partition.udpGroup:228.11.11.11}"
+             mcast_addr="${jboss.jgroups.udp_async.mcast_addr:228.11.11.11}"
              bind_port="${jboss.jgroups.udp_async.bind_port:55225}"
              tos="8"
              ucast_recv_buf_size="20000000"
@@ -180,7 +180,7 @@
             <UDP
                  singleton_name="udp_sync"
                  mcast_port="${jboss.jgroups.udp_sync.mcast_port:45699}"
-                 mcast_addr="${jboss.jgroups.udp_sync.mcast_addr,jboss.partition.udpGroup:229.11.11.11}"
+                 mcast_addr="${jboss.jgroups.udp_sync.mcast_addr:229.11.11.11}"
                  bind_port="${jboss.jgroups.udp_sync.bind_port:55250}"
                  tos="8"
                  ucast_recv_buf_size="20000000"
@@ -278,8 +278,8 @@
 		      <!-- Alternative 1: multicast-based automatic discovery. -->   
             <MPING timeout="3000"
                    num_initial_members="3"
-                   mcast_addr="${jboss.jgroups.tcp.mping_mcast_addr,jboss.partition.udpGroup:230.11.11.11}"
-                   mcast_port="${jgroups.tcp.mping_mcast_port,jboss.jgroups.tcp.mping_mcast_port:45700}"
+                   mcast_addr="${jboss.jgroups.tcp.mping_mcast_addr:230.11.11.11}"
+                   mcast_port="${jgroups.tcp.mping_mcast_port:45700}"
                    ip_ttl="${jgroups.udp.ip_ttl:2}"/>            
             <!-- Alternative 2: non multicast-based replacement for MPING. Requires a static configuration
                  of *all* possible cluster members.
@@ -357,7 +357,7 @@
             <!-- Alternative 1: multicast-based automatic discovery. -->   
             <MPING timeout="3000"
                    num_initial_members="3"
-                   mcast_addr="${jboss.jgroups.tcp_sync.mping_mcast_addr,jboss.partition.udpGroup:231.11.11.11}"
+                   mcast_addr="${jboss.jgroups.tcp_sync.mping_mcast_addr:231.11.11.11}"
                    mcast_port="${jboss.jgroups.tcp_sync.mping_mcast_port:45701}"
                    ip_ttl="${jgroups.udp.ip_ttl:2}"/>           
             <!-- Alternative 2: non multicast-based replacement for MPING. Requires a static configuration
@@ -438,7 +438,7 @@
            description="Stack optimized for the JBoss Messaging Data Channel">
         <config>
             <TCP singleton_name="jbm-data"
-                 start_port="${jboss.messaging.datachanneltcpport,jboss.jgroups.jbm_data.tcp_port:7900}"
+                 start_port="${jboss.messaging.datachanneltcpport:7900}"
                  loopback="true"
                  recv_buf_size="20000000"
                  send_buf_size="640000"
@@ -466,8 +466,8 @@
                  oob_thread_pool.queue_enabled="false"
                  oob_thread_pool.rejection_policy="discard"/>
             <MPING timeout="5000"
-               mcast_addr="${jboss.jgroups.jbm_data.mping_mcast_addr,jboss.partition.udpGroup:228.6.6.6}"
-               mcast_port="${jboss.messaging.datachanneludpport,jboss.jgroups.jbm_data.mping_mcast_port:45710}"
+               mcast_addr="${jboss.jgroups.jbm_data.mping_mcast_addr:228.6.6.6}"
+               mcast_port="${jboss.messaging.datachanneludpport:45710}"
                ip_ttl="${jboss.messaging.ipttl:8}"
                num_initial_members="5"
                num_ping_requests="3"/>

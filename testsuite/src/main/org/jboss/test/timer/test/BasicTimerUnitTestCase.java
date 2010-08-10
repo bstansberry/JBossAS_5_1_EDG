@@ -156,15 +156,16 @@ public class BasicTimerUnitTestCase extends JBossTestCase
    {
       TimerSLSBHome home = (TimerSLSBHome) getEJBHome(TimerSLSBHome.JNDI_NAME);
       TimerSLSB bean = home.create();
-      byte[] handle = bean.startTimer(SHORT_PERIOD);
+      String timerName = "testStatelessSessionBeanTimer";
+      bean.startTimer(timerName, SHORT_PERIOD);
       Thread.sleep(12 * SHORT_PERIOD + SHORT_PERIOD);
-      int count = bean.getTimeoutCount(handle);
-      bean.stopTimer(handle);
+      int count = bean.getTimeoutCount(timerName);
+      bean.stopTimer(timerName);
       assertTrue("Timeout was expected to be called at least 10 times but was "
          + "only called: " + count + " times",
          count >= 10);
       Thread.sleep(5 * SHORT_PERIOD);
-      int count2 = bean.getTimeoutCount(handle);
+      int count2 = bean.getTimeoutCount(timerName);
       assertTrue("After the timer was stopped no timeout should happen but "
          + "it was called " + count2 + " more times",
          count2 == 0);
@@ -191,6 +192,7 @@ public class BasicTimerUnitTestCase extends JBossTestCase
       // We need to make sure that the next timer interval occurs
       // while the retry timeout is STILL running in order to test JBAS-1926
       final long retryMs = bean.getRetryTimeoutPeriod();
+      String timerName = "testStatelessSessionBeanTimerRetry";
       log.info("testStatelessSessionBeanTimerRetry():GOT RETRY TIME:" + retryMs);
       assertFalse("Failed to get valid retry timeout!", retryMs == -1);
       final HashMap info = new HashMap();
@@ -203,13 +205,13 @@ public class BasicTimerUnitTestCase extends JBossTestCase
       final int taskTime = SHORT_PERIOD * 2;
       info.put(TimerSLSB.INFO_TASK_RUNTIME,new Integer(taskTime)); // the time is takes to execute the task
 
-      final byte[] handle = bean.startTimer(SHORT_PERIOD,info);
+      bean.startTimer(timerName, SHORT_PERIOD,info);
       // Wait for 1 SHORT_PERIOD for the first firing
       // Another retryMs for the amount of time it takes for the retry to happen
       // and finally the amount of time that it takes to execute the task and 200ms to be safe.
       Thread.sleep(SHORT_PERIOD  + retryMs + taskTime + 200);
-      int count = bean.getTimeoutCount(handle);
-      bean.stopTimer(handle);
+      int count = bean.getTimeoutCount(timerName);
+      bean.stopTimer(timerName);
       assertEquals("Timeout was called too many times. Should have been once for the initial" +
             ", and once for the retry during the time allotted.",2,count);
 
@@ -227,15 +229,16 @@ public class BasicTimerUnitTestCase extends JBossTestCase
    {
       TimerSLSBHome home = (TimerSLSBHome) getEJBHome(TimerSLSBHome.JNDI_NAME);
       TimerSLSB bean = home.create();
-      byte[] handle = bean.startSingleTimer(SHORT_PERIOD);
+      final String timerName = "testStatelessSessionBeanSingleTimer";
+      bean.startSingleTimer(timerName, SHORT_PERIOD);
       Thread.sleep(5 * SHORT_PERIOD);
-      int lCount = bean.getTimeoutCount(handle);
+      int lCount = bean.getTimeoutCount(timerName);
       assertTrue("Timeout was expected to be called only once but was called: "
          + lCount + " times",
          lCount == 1);
       try
       {
-         bean.stopTimer(handle);
+         bean.stopTimer(timerName);
          fail("A single timer should expire after the first event and therefore this "
             + "has to throw an NoSuchObjectLocalException");
       }
@@ -263,10 +266,10 @@ public class BasicTimerUnitTestCase extends JBossTestCase
       log.info("testStatelessSessionBeanSingleTimer(): Testing retry on timer.");
       final HashMap info = new HashMap(1);
       info.put(TimerSLSB.INFO_EXEC_FAIL_COUNT,new Integer(1));
-      handle = bean.startSingleTimer(SHORT_PERIOD,info);
+      bean.startSingleTimer(timerName, SHORT_PERIOD,info);
       Thread.sleep(5 * SHORT_PERIOD);
       assertEquals("Timeout was expected to be called twice, once inititially, one once for the retry.",
-               2,bean.getTimeoutCount(handle));
+               2,bean.getTimeoutCount(timerName));
 
 
    }
@@ -568,20 +571,17 @@ public class BasicTimerUnitTestCase extends JBossTestCase
    {
       TimerSLSBHome home = (TimerSLSBHome) getEJBHome(TimerSLSBHome.JNDI_NAME);
       TimerSLSB bean = home.create();
-      byte[] handle = bean.startTimer(LONG_PERIOD);
-      Date lNextEvent = bean.getNextTimeout(handle);
+      String timerName = "testTimerImplementation";
+      bean.startTimer(timerName, LONG_PERIOD);
+      Date lNextEvent = bean.getNextTimeout(timerName);
       long lUntilNextEvent = lNextEvent.getTime() - new Date().getTime();
       Thread.sleep(SHORT_PERIOD);
-      long lTimeRemaining = bean.getTimeRemaining(handle);
-      Object info = bean.getInfo(handle);
+      long lTimeRemaining = bean.getTimeRemaining(timerName);
       assertTrue("Date of the next event must be greater than 0", lUntilNextEvent > 0);
       assertTrue("Period until next event must be greater than 0", lTimeRemaining > 0);
       assertTrue("Period until next event must be smaller than time until next even because it "
          + "it is called later", lUntilNextEvent > lTimeRemaining);
-      assertTrue("Info("+info+") must be 'TimerSLSBean.startTimer'",
-         "TimerSLSBean.startTimer".equals(info));
-      assertTrue("Must be able to get a handle", handle != null);
-      bean.stopTimer(handle);
+      bean.stopTimer(timerName);
    }
 
    /**
@@ -597,7 +597,7 @@ public class BasicTimerUnitTestCase extends JBossTestCase
       TimerSLSB bean = home.create();
       try
       {
-         bean.startTimer(SHORT_PERIOD);
+         bean.startTimer("testBadStatelessSessionBeanTimer", SHORT_PERIOD);
          fail("Was able to call NoTimedObjectBean.startTimer");
       }
       catch(RemoteException e)

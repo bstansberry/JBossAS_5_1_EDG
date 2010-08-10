@@ -676,7 +676,13 @@
                </bean>
                <bean class="org.jboss.services.binding.SystemPropertyBinding">
                   <constructor>
-                     <parameter>jboss.jgroups.tcp.mping_mcast_port</parameter>
+                     <!-- 
+                        NOTE: this property should be jboss.jgroups.tcp.mping_mcast_port
+                        to be consistent with the naming system used for other
+                        JGroups related properties, but to preserve compatibility
+                        with previous EAP 5 releases the leading 'jboss' is ommitted.
+                      -->
+                     <parameter>jgroups.tcp.mping_mcast_port</parameter>
                      <parameter class="int">
                         <value-factory bean="ServiceBindingManager" method="getIntBinding">
                              <parameter>JGroups</parameter>
@@ -710,7 +716,14 @@
                </bean>
                <bean class="org.jboss.services.binding.SystemPropertyBinding">
                   <constructor>
-                     <parameter>jboss.jgroups.jbm_data.tcp_port</parameter>
+                     <!-- 
+                        NOTE: this property should be jboss.jgroups.jbm_data.tcp_port
+                        to be consistent with the naming system used for other
+                        JGroups related properties, but to preserve compatibility
+                        with previous EAP 5 releases jboss.messaging.datachanneltcpport
+                        is used.
+                      -->
+                     <parameter>jboss.messaging.datachanneltcpport</parameter>
                      <parameter class="int">
                         <value-factory bean="ServiceBindingManager" method="getIntBinding">
                              <parameter>JGroups</parameter>
@@ -721,7 +734,14 @@
                </bean>
                <bean class="org.jboss.services.binding.SystemPropertyBinding">
                   <constructor>
-                     <parameter>jboss.jgroups.jbm_data.mping_mcast_port</parameter>
+                     <!-- 
+                        NOTE: this property should be jboss.jgroups.jbm_data.mping_mcast_port
+                        to be consistent with the naming system used for other
+                        JGroups related properties, but to preserve compatibility
+                        with previous EAP 5 releases jboss.messaging.datachanneludpport
+                        is used.
+                      -->
+                     <parameter>jboss.messaging.datachanneludpport</parameter>
                      <parameter class="int">
                         <value-factory bean="ServiceBindingManager" method="getIntBinding">
                              <parameter>JGroups</parameter>

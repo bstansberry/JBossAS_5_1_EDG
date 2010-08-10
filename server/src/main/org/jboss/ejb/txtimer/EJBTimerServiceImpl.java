@@ -23,19 +23,20 @@ package org.jboss.ejb.txtimer;
 
 // $Id: EJBTimerServiceImpl.java 105909 2010-06-09 21:53:50Z miclark $
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
-import java.io.Serializable;
 
-import javax.ejb.TimerService;
-import javax.ejb.Timer;
 import javax.ejb.EJBException;
+import javax.ejb.Timer;
+import javax.ejb.TimerService;
+import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import javax.transaction.TransactionManager;
 
@@ -241,7 +242,16 @@ public class EJBTimerServiceImpl extends ServiceMBeanSupport
       // Get a proxy to the persistence policy
       try
       {
-         persistencePolicy = (PersistencePolicy)MBeanProxyExt.create(PersistencePolicy.class, persistencePolicyName, server);
+         // JBPAPP-4681
+         if (this.isPersistencePolicyExt(persistencePolicyName))
+         {
+            persistencePolicy = (PersistencePolicy)MBeanProxyExt.create(PersistencePolicyExt.class, persistencePolicyName, server);  
+         }
+         else
+         {
+            persistencePolicy = (PersistencePolicy)MBeanProxyExt.create(PersistencePolicy.class, persistencePolicyName, server);   
+         }
+         
       }
       catch (Exception e)
       {
@@ -249,6 +259,9 @@ public class EJBTimerServiceImpl extends ServiceMBeanSupport
          persistencePolicy = new NoopPersistencePolicy();
       }
 
+      
+      
+      
       // Get the timerId generator
       try
       {
@@ -478,8 +491,14 @@ public class EJBTimerServiceImpl extends ServiceMBeanSupport
                ContainerMBean container = (ContainerMBean)MBeanProxyExt.create(ContainerMBean.class, containerId, server);               
                TimerService timerService = container.getTimerService(targetId.getInstancePk());
 
+               // JBPAPP-4681
+               if (timerService instanceof TimerRestoringTimerService)
+               {
+                  TimerRestoringTimerService timerRestoringTimerService = (TimerRestoringTimerService) timerService;
+                  timerRestoringTimerService.restoreTimer(handle.getFirstTime(), handle.getPeriode(), handle.getNextTimeout(), handle.getInfo(), handle.getTimerId());
+               }
                // Fix for JBPAPP-3926
-               if (timerService instanceof PersistentIdTimerService)
+               else if (timerService instanceof PersistentIdTimerService)
                {
                   PersistentIdTimerService persistentIdTimerService = (PersistentIdTimerService) timerService;
                   persistentIdTimerService.createTimer(handle.getFirstTime(), handle.getPeriode(), handle.getInfo(), handle.getTimerId());
@@ -530,4 +549,46 @@ public class EJBTimerServiceImpl extends ServiceMBeanSupport
       }
       return retBuffer.toString();
    } 
+   
+   /**
+    * Returns true if the {@link Class} which backs the MBean instance represented by the
+    * passed <code>persistencePolicyObjectName</code> is of type {@link PersistencePolicyExt}.
+    * Else returns false
+    * 
+    * @param persistencePolicyObjectName The {@link ObjectName} of the persistence policy MBean
+    * @return
+    */
+   // JBPAPP-4681
+   private boolean isPersistencePolicyExt(ObjectName persistencePolicyObjectName)
+   {
+      if (persistencePolicyObjectName == null)
+      {
+         return false;
+      }
+      try
+      {
+         // get the MBean ObjectInstance from the MBean server
+         ObjectInstance persistencePolicyMBeanInstance = this.server.getObjectInstance(persistencePolicyObjectName);
+         // get hold of the class name
+         String persistencePolicyInstanceClassName = persistencePolicyMBeanInstance.getClassName();
+
+         // load the persistence policy class
+         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+         Class<?> persistencePolicyClass = tccl.loadClass(persistencePolicyInstanceClassName);
+         // check whether it's of type PersistencePolicyExt
+         if (PersistencePolicyExt.class.isAssignableFrom(persistencePolicyClass))
+         {
+            return true;
+         }
+      }
+      catch (Exception e)
+      {
+         // ignore
+         log.debug("Could not determine whether: " + persistencePolicyObjectName + " implements "
+               + PersistencePolicyExt.class + " - will assume that it doesn't");
+         return false;
+      }
+      
+      return false;
+   }
 }

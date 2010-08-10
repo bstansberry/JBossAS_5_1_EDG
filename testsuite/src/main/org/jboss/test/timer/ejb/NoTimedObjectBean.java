@@ -21,8 +21,9 @@
  */
 package org.jboss.test.timer.ejb;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
@@ -41,51 +42,51 @@ public class NoTimedObjectBean
 {
    private SessionContext context;
 
-   public byte[] startSingleTimer(long pPeriod)
+   public void startSingleTimer(String timerName, long pPeriod)
    {
-      return startSingleTimer(pPeriod,"TimerSLSBean.startSingleTimer");
+      startSingleTimer(timerName, pPeriod, new HashMap());
    }
 
-   public byte[] startSingleTimer(long pPeriod, Serializable info)
-   {
-      TimerService ts = context.getTimerService();
-      throw new EJBException("startSingleTimer.getTimerService should have failed");
-   }
-
-   public byte[] startTimer(long pPeriod)
+   public void startSingleTimer(String timerName, long pPeriod, HashMap info)
    {
       TimerService ts = context.getTimerService();
       throw new EJBException("startSingleTimer.getTimerService should have failed");
    }
 
-   public byte[] startTimer(long pPeriod, Serializable info)
+   public void startTimer(String timerName, long pPeriod)
    {
       TimerService ts = context.getTimerService();
       throw new EJBException("startSingleTimer.getTimerService should have failed");
    }
 
-   public void stopTimer(byte[] handle)
+   public void startTimer(String timerName, long pPeriod, HashMap info)
    {
       TimerService ts = context.getTimerService();
       throw new EJBException("startSingleTimer.getTimerService should have failed");
    }
 
-   public int getTimeoutCount(byte[] handle)
+   public void stopTimer(String timerName)
+   {
+      TimerService ts = context.getTimerService();
+      throw new EJBException("startSingleTimer.getTimerService should have failed");
+   }
+
+   public int getTimeoutCount(String timerName)
    {
       return 0;
    }
 
-   public Date getNextTimeout(byte[] handle)
+   public Date getNextTimeout(String timerName)
    {
       return null;
    }
 
-   public long getTimeRemaining(byte[] handle)
+   public long getTimeRemaining(String timerName)
    {
       return 0;
    }
 
-   public Object getInfo(byte[] handle)
+   public Object getInfo(String timerName)
    {
       return null;
    }

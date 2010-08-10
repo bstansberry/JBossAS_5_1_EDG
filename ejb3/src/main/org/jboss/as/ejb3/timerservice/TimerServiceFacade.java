@@ -34,11 +34,10 @@ import javax.ejb.Timer;
 import javax.ejb.TimerService;
 import javax.management.ObjectName;
 
-import org.jboss.logging.Logger;
-
-import org.jboss.ejb.txtimer.PersistentIdTimerService;
-
 import org.jboss.ejb.AllowedOperationsAssociation;
+import org.jboss.ejb.txtimer.PersistentIdTimerService;
+import org.jboss.ejb.txtimer.TimerRestoringTimerService;
+import org.jboss.logging.Logger;
 
 /**
  * Holds the association with the container, without exposing it.
@@ -48,7 +47,7 @@ import org.jboss.ejb.AllowedOperationsAssociation;
  * 
  * @version $Revision: 105909 $
  */
-public class TimerServiceFacade implements PersistentIdTimerService
+public class TimerServiceFacade implements TimerRestoringTimerService
 {
    private static Logger log = Logger.getLogger(TimerServiceFacade.class);
    
@@ -86,6 +85,7 @@ public class TimerServiceFacade implements PersistentIdTimerService
    }
    
    // JBPAPP-3926
+   @Override
    public Timer createTimer(Date initialExpiration, long intervalDuration, Serializable info, String timerId) throws IllegalArgumentException, IllegalStateException, EJBException
    {
 	  if (delegate instanceof PersistentIdTimerService)
@@ -98,6 +98,28 @@ public class TimerServiceFacade implements PersistentIdTimerService
 		  log.warn("Unable to preserve timerId. Will generate new timerId");
 		  return delegate.createTimer(initialExpiration, intervalDuration, info);
 	  }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Timer restoreTimer(Date initialExpiration, long intervalDuration, Date nextExpiry, Serializable info,
+         String timerId) throws IllegalArgumentException, IllegalStateException, EJBException
+   {
+      if (delegate instanceof TimerRestoringTimerService)
+      {
+         TimerRestoringTimerService persistentTimerService = (TimerRestoringTimerService) delegate;
+         // restore the timer
+         return persistentTimerService.restoreTimer(initialExpiration, intervalDuration, nextExpiry, info, timerId);
+      }
+      else
+      {
+         log.warn("Unable to restore timer, since the delegate timerservice " + delegate.getClass() + " isn't of type "
+               + TimerRestoringTimerService.class + " - will create the timer afresh");
+          // we can't "restore" the timer state, so let's just recreate the timer afresh, using the initial expiry date and the repeat interval
+          return delegate.createTimer(initialExpiration, intervalDuration, info);
+      }
    }
 
    public Timer createTimer(long duration, Serializable info) throws IllegalArgumentException, IllegalStateException, EJBException

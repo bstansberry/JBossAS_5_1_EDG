@@ -75,8 +75,8 @@ public class OracleDatabasePersistencePlugin extends GeneralPurposeDatabasePersi
          String sql = "insert into " + getTableName() + " " +
                  "(" + getColumnTimerID() + "," + getColumnTargetID() +
                  "," + getColumnInitialDate() + "," + getColumnTimerInterval() +
-                 "," + getColumnInstancePK() + "," + getColumnInfo() + ") " +
-                 "values (?,?,?,?,?,?)";
+                 "," + getColumnInstancePK() + "," + getColumnInfo() + "," + getColumnNextDate() +  ") " +
+                 "values (?,?,?,?,?,?,?)";
          st = con.prepareStatement(sql);
 
          st.setString(1, timerId);
@@ -105,6 +105,9 @@ public class OracleDatabasePersistencePlugin extends GeneralPurposeDatabasePersi
          {
             st.setBytes(6, null);
          }
+         // set the next timeout date, which when the timer is being created, is equal to the initial
+         // date of expiry.
+         st.setTimestamp(7, new Timestamp(initialExpiration.getTime()));
 
          int rows = st.executeUpdate();
          if (rows != 1)
@@ -145,6 +148,8 @@ public class OracleDatabasePersistencePlugin extends GeneralPurposeDatabasePersi
             if (containerId == null || containerId.equals(targetId.getContainerId()))
             {
                Date initialDate = rs.getTimestamp(getColumnInitialDate());
+               Date nextTimeout = rs.getTimestamp(getColumnNextDate());
+               
                long interval = rs.getLong(getColumnTimerInterval());
                
                InputStream isPk = rs.getBinaryStream(getColumnInstancePK());
@@ -164,7 +169,7 @@ public class OracleDatabasePersistencePlugin extends GeneralPurposeDatabasePersi
                }
                // is this really needed? targetId encapsulates pKey as well!
                targetId = new TimedObjectId(targetId.getContainerId(), pKey);
-               TimerHandleImpl handle = new TimerHandleImpl(timerId, targetId, initialDate, interval, info);
+               TimerHandleImpl handle = new TimerHandleImpl(timerId, targetId, initialDate, nextTimeout, interval, info);
                
                list.add(handle);
             }

@@ -1222,6 +1222,7 @@
       <exclude name="**/test/security/test/client/*UnitTestCase.class"/>
       <exclude name="**/test/profileservice/testsecure/*UnitTestCase.class"/>
       <exclude name="**/test/passwordinjection/test/*UnitTestCase.class"/>
+      <exclude name="**/test/security/test/authorization/secured/*UnitTestCase.class"/>
    </patternset>
    <!-- A patternset that requires jboss to run with a security manager -->
    <patternset id="securitymgr.includes">

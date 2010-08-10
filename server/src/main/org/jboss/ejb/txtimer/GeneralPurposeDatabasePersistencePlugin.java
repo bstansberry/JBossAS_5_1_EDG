@@ -63,7 +63,7 @@ import org.jboss.mx.util.ObjectNameFactory;
  * @version $Revision: 81500 $
  * @since 23-Sep-2004
  */
-public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersistencePluginExt
+public class GeneralPurposeDatabasePersistencePlugin implements UpdateableDatabasePersistencePlugin
 {
    /** logging support */
    private static Logger log = Logger.getLogger(GeneralPurposeDatabasePersistencePlugin.class);
@@ -152,6 +152,7 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
                     " " + getColumnTimerID() + " varchar(80) not null," +
                     " " + getColumnTargetID() + " varchar(250) not null," +
                     " " + getColumnInitialDate() + " " + dateType + " not null," +
+                    " " + getColumnNextDate() + " " + dateType + "," +
                     " " + getColumnTimerInterval() + " " + longType + "," +
                     " " + getColumnInstancePK() + " " + objectType + "," +
                     " " + getColumnInfo() + " " + objectType + ", ");
@@ -173,6 +174,27 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
 
             st = con.createStatement();
             st.executeUpdate(createTableDDL.toString());
+         }
+         else if (this.isNextDateColumnPresent() == false) // the timer table exists but the next timeout date column is absent, so create the column
+         {
+        	 // JBPAPP-4681 https://jira.jboss.org/browse/JBPAPP-4681 introduces a new column
+        	 // in the table. Here, we make sure to create the column in already existing DBs
+        	 
+        	 con = ds.getConnection();
+
+             String dateType = typeMapping.getTypeMappingMetaData(Timestamp.class).getSqlType();
+
+             // The alter table DDL
+             StringBuffer alterTableDDL = new StringBuffer("alter table " + getTableName() + " ADD " +
+                     " " + getColumnNextDate() + " " + dateType);
+
+				log.debug("Adding new column " + getColumnNextDate()
+						+ " to table " + getTableName() + " - executing DDL: "
+						+ alterTableDDL);
+
+             st = con.createStatement();
+             st.executeUpdate(alterTableDDL.toString());
+        	 
          }
       }
       catch (SQLException e)
@@ -201,8 +223,8 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
          con = ds.getConnection();
 
          String sql = "insert into " + getTableName() + " " +
-                 "(" + getColumnTimerID() + "," + getColumnTargetID() + "," + getColumnInitialDate() + "," + getColumnTimerInterval() + "," + getColumnInstancePK() + "," + getColumnInfo() + ") " +
-                 "values (?,?,?,?,?,?)";
+                 "(" + getColumnTimerID() + "," + getColumnTargetID() + "," + getColumnInitialDate() + "," + getColumnTimerInterval() + "," + getColumnInstancePK() + "," + getColumnInfo() + ","  + getColumnNextDate() + ") " +
+                 "values (?,?,?,?,?,?,?)";
          st = con.prepareStatement(sql);
 
          st.setString(1, timerId);
@@ -229,7 +251,10 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
          {
             st.setBytes(6, bytes);
          }
-
+         // set the next timeout date, which when the timer is being created, is equal to the initial
+         // date of expiry.
+         st.setTimestamp(7, new Timestamp(initialExpiration.getTime()));
+         
          int rows = st.executeUpdate();
          if (rows != 1)
             log.error("Unable to insert timer for: " + timedObjectId);
@@ -267,6 +292,7 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
             if (containerId == null || containerId.equals(targetId.getContainerId()))
             {
                Date initialDate = rs.getTimestamp(getColumnInitialDate());
+               Date nextTimeout = rs.getTimestamp(getColumnNextDate());
                long interval = rs.getLong(getColumnTimerInterval());
                Serializable pKey = (Serializable)deserialize(rs.getBytes(getColumnInstancePK()));
                Serializable info = null;
@@ -283,7 +309,7 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
                }
                // is this really needed? targetId encapsulates pKey as well!
                targetId = new TimedObjectId(targetId.getContainerId(), pKey);
-               TimerHandleImpl handle = new TimerHandleImpl(timerId, targetId, initialDate, interval, info);
+               TimerHandleImpl handle = new TimerHandleImpl(timerId, targetId, initialDate, nextTimeout, interval, info);
                list.add(handle);
             }
          }
@@ -355,6 +381,78 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
          JDBCUtil.safeClose(con);
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    * @throws NullPointerException If either <code>timerId</code> or <code>timedObjectId</code> or both are null
+    */
+   @Override
+   public void updateNextTimeout(String timerId, TimedObjectId timedObjectId, Date nextTimeout) throws SQLException
+   {
+      if (timerId == null || timedObjectId == null)
+      {
+         throw new NullPointerException();
+      }
+      
+      log.debug("Updating next timeout date to " + nextTimeout + " for timer: " + timerId + " ,timedObjectId: "
+            + timedObjectId.toString());
+      
+      Connection con = null;
+      PreparedStatement st = null;
+
+      try
+      {
+         con = ds.getConnection();
+
+         // update the next timeout date column value
+         String sql = "update " + getTableName() +
+         " " + " SET " + getColumnNextDate() + "=?" +
+         " where " + getColumnTimerID() + "=? and " + getColumnTargetID() + "=?";
+         
+         st = con.prepareStatement(sql);
+
+         if (nextTimeout == null)
+         {
+            JDBCTypeMappingMetaData typeMapping = (JDBCTypeMappingMetaData)server.getAttribute(metaDataName, "TypeMappingMetaData");
+            if (typeMapping == null)
+            {
+               throw new IllegalStateException("Cannot obtain type mapping from: " + metaDataName);
+            }
+            int dateType = typeMapping.getTypeMappingMetaData(Timestamp.class).getJdbcType();
+            // set the next timeout as null
+            st.setNull(1, dateType);
+         }
+         else
+         {
+            st.setTimestamp(1, new Timestamp(nextTimeout.getTime()));
+         }
+         st.setString(2, timerId);
+         st.setString(3, timedObjectId.toString());
+
+         // run the update sql
+         int rows = st.executeUpdate();
+         
+         if (rows != 1)
+         {
+            log.debug("Unexpected update row count: " + rows + " for timer: " + timerId + " timedObjectId: "
+                  + timedObjectId.toString());
+         }
+      }
+      catch (SQLException sqle)
+      {
+         throw sqle;
+      }
+      catch (Exception e)
+      {
+         log.error("Could not update next timeout date for timerId: " + timerId + " timedObjectId: "
+               + timedObjectId.toString(), e);
+      }
+      finally
+      {
+         JDBCUtil.safeClose(st);
+         JDBCUtil.safeClose(con);
+      }
+   }
 
    /** Get the timer table name */
    public String getTableName()
@@ -380,6 +478,12 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
       return "INITIALDATE";
    }
 
+   /** Returns the column name of the next timeout date */
+   public String getColumnNextDate()
+   {
+	   return "NEXTDATE";
+   }
+   
    /** Get the timer interval column name */
    public String getColumnTimerInterval()
    {
@@ -461,6 +565,50 @@ public class GeneralPurposeDatabasePersistencePlugin implements DatabasePersiste
       {
          log.error("Cannot deserialize", e);
          return null;
+      }
+   }
+   
+   /**
+    * Returns true if the timer table already contains the next timeout date column (represented
+    * by {@link #getColumnNextDate()}). Else returns false.
+    * @return
+    */
+   // JBPAPP-4681
+   private boolean isNextDateColumnPresent()
+   {
+      // Just fire a query on the timer table with the next timeout date column in the
+      // select clause. If the query fails, then the column in considered absent.
+      // I don't like this implementation, but this is the simplest. And since this method
+      // is only there to take care of already existing Timer table, this impl should be OK for now
+      Connection con = null;
+      PreparedStatement st = null;
+      try
+      {
+         con = ds.getConnection();
+
+         String sql = "select " + getColumnNextDate() + " from " + getTableName() + " where " + getColumnTimerID()
+               + "=?";
+
+         st = con.prepareStatement(sql);
+         st.setString(1, "");
+
+         st.executeQuery();
+         return true;
+
+      }
+      catch (SQLException sqle)
+      {
+         // consider any sqlexception as an indication of column absence.
+         // I don't like this, but this is the simplest way to figure out the presence of the 
+         // column, instead of having to go via the DatabaseMetaData JDBC API. 
+         // After all, this method comes into picture only when the timer table is already present
+         // (i.e. on existing deployments)
+         return false;
+      }
+      finally
+      {
+         JDBCUtil.safeClose(st);
+         JDBCUtil.safeClose(con);
       }
    }
 }

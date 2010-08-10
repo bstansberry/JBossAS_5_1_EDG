@@ -117,16 +117,17 @@ public class SecureTimerUnitTestCase extends JBossTestCase
       login();
       TimerSLSBHome home = (TimerSLSBHome) getEJBHome(TimerSLSBHome.SECURED_JNDI_NAME);
       TimerSLSB bean = home.create();
-      byte[] handle = bean.startTimer(SHORT_PERIOD);
+      String timerName = "testSecuredStatelessSessionBeanTimer";
+      bean.startTimer(timerName, SHORT_PERIOD);
       // Sleep for 20x the timer interval and expect at least 10 events
       Thread.sleep(20 * SHORT_PERIOD);
-      int count = bean.getTimeoutCount(handle);
-      bean.stopTimer(handle);
+      int count = bean.getTimeoutCount(timerName);
+      bean.stopTimer(timerName);
       assertTrue("Timeout was expected to be called at least 10 times but was "
          + "only called: " + count + " times",
          count >= 10);
       Thread.sleep(5 * SHORT_PERIOD);
-      int count2 = bean.getTimeoutCount(handle);
+      int count2 = bean.getTimeoutCount(timerName);
       assertTrue("After the timer was stopped no timeout should happen but "
          + "it was called " + count2 + " more times",
          count2 == 0);
@@ -145,15 +146,16 @@ public class SecureTimerUnitTestCase extends JBossTestCase
       login();
       TimerSLSBHome home = (TimerSLSBHome) getEJBHome(TimerSLSBHome.SECURED_JNDI_NAME);
       TimerSLSB bean = home.create();
-      byte[] handle = bean.startSingleTimer(SHORT_PERIOD);
+      String timerName = "testSecuredStatelessSessionBeanSingleTimer";
+      bean.startSingleTimer(timerName, SHORT_PERIOD);
       Thread.sleep(5 * SHORT_PERIOD);
-      int count = bean.getTimeoutCount(handle);
+      int count = bean.getTimeoutCount(timerName);
       assertTrue("Timeout was expected to be called only once but was called: "
          + count + " times",
          count == 1);
       try
       {
-         bean.stopTimer(handle);
+         bean.stopTimer(timerName);
          fail("A single timer should expire after the first event and therefore this "
             + "has to throw an NoSuchObjectLocalException");
       }

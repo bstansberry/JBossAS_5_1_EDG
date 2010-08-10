@@ -98,6 +98,12 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
    private int timerState;
    private Timer utilTimer;
    private int hashCode;
+   
+   /**
+    * Flag which indicates if one or more timeouts were missed due to (for example) server
+    * being down
+    */
+   private boolean missedTimeout;
 
    /**
     * Schedules the txtimer for execution at the specified time with a specified periode.
@@ -115,15 +121,60 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
 
    void startTimer(Date firstTime, long periode)
    {
-      this.firstTime = firstTime;
-      this.nextExpire = firstTime.getTime();
+      this.startTimer(firstTime, firstTime, periode);
+
+   }
+   
+   /**
+    * Schedules any tasks for the timer, based on the passed <code>firstTimeout<code>,
+    * the <code>nextTimeout</code> and the <code>periode</code>
+    * 
+    * @param firstTimeout {@link Date} on which the first timeout of the timer occurs/occurred
+    * @param nextTimeout The {@link Date} on which the next timeout of the timer occurs. Can be null, in which case
+    *                   the <code>firstTimeout</code> is considered to be the next timeout. 
+    * @param periode The repeat interval of the timer
+    */
+   void startTimer(Date firstTimeout, Date nextTimeout, long periode)
+   {
+      this.firstTime = firstTimeout;
+      if (nextTimeout == null)
+      {
+         nextTimeout = firstTimeout;
+      }
+      this.nextExpire = nextTimeout.getTime();
       this.periode = periode;
+      
+      Date now = new Date();
+      // if the next timeout points to a time in the past, then 
+      // it means that the server was either down or the timeout wasn't fired for
+      // some other reason. As per the EJB spec, we should fire the timeout
+      // for the *missed* timeout atleast once. Here we create a single action
+      // timeout which will fire immediately. At the same time we also (re)compute the 
+      // actual next timeout *from now* and create a periodic timer task for the same
+      if (nextTimeout.before(now) && periode > 0)
+      {
+         long timeInThePast = nextTimeout.getTime();
+         long current = now.getTime(); 
+         
+         // recompute the next timeout based on the current time
+         long timeElapsedSinceLastExpectedTimeout = (current - timeInThePast) % periode;
+         long timeRemainingUntilNextTimeout = timeElapsedSinceLastExpectedTimeout == 0 ? 0 : periode - timeElapsedSinceLastExpectedTimeout;
+         long next = current + timeRemainingUntilNextTimeout;
+         
+         this.nextExpire = next;
+         // persist the recomputed next timeout
+         this.persistNextTimeout();
+         // set the flag which indicates that this timer has missed one (or more) timeouts.
+         // This flag will later be used for firing a single action (backlog) timer
+         this.missedTimeout = true;
+      }
 
       timerService.addTimer(this);
       registerTimerWithTx();
       
       // the timer will actually go ACTIVE on tx commit
       startInTx();
+
    }
 
    public String getTimerId()
@@ -371,6 +422,13 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
       else
       {
          setTimerState(ACTIVE);
+         // if some timeouts were missed, then trigger a single action
+         // timer task for the backlog 
+         if (this.missedTimeout)
+         {
+            this.triggerBacklogTimeoutNow();
+         }
+         // schedule the regular timeouts
          scheduleTimeout();
       }
    }
@@ -386,9 +444,23 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
    private void scheduleTimeout()
    {
       if (periode > 0)
+      {
+         // schedule the periodic timer task
          utilTimer.schedule(new TimerTaskImpl(this), new Date(nextExpire), periode);
+      }
       else
-         utilTimer.schedule(new TimerTaskImpl(this), new Date(nextExpire));      
+      {
+         utilTimer.schedule(new TimerTaskImpl(this), new Date(nextExpire));
+      }
+   }
+   
+   /**
+    * Schedules a timer task to fire once, immediately. Used for
+    * triggering a task for backlog timeouts (i.e. timeouts which were missed)
+    */
+   private void triggerBacklogTimeoutNow()
+   {
+      utilTimer.schedule(new TimerTaskImpl(this, true), new Date());
    }
    
    /**
@@ -459,6 +531,13 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
          switch (timerState)
          {
             case STARTED_IN_TX:
+               // if some timeouts were missed, then trigger a single action
+               // timer task for the backlog 
+               if (this.missedTimeout)
+               {
+                  this.triggerBacklogTimeoutNow();
+               }
+               // schedule the regular timeouts
                scheduleTimeout();
                setTimerState(ACTIVE);
                break;
@@ -525,9 +604,29 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
    {
       private TimerImpl timer;
 
+      /**
+       * A backlog indicates that this {@link TimerTaskImpl} was fired
+       * for a timeout which occurred in the past (for example, the timeout occurred when the server
+       * was down and this timer task was fired to account for that)
+       */
+      private boolean backlog;
+      
       public TimerTaskImpl(TimerImpl timer)
       {
          this.timer = timer;
+      }
+      
+      /**
+       * 
+       * @param timer The timer instance
+       * @param backlog True if this {@link TimerTaskImpl} was fired for a timeout which occurred in the past
+       *                (for example, the timeout occurred when the server
+       *                    was down and this timer task was fired to account for that)
+       */
+      public TimerTaskImpl(TimerImpl timer, boolean backlog)
+      {
+         this.timer = timer;
+         this.backlog = backlog;
       }
 
       /**
@@ -538,11 +637,15 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
          log.debug("run: " + timer);
 
          // Set next scheduled execution attempt. This is used only
-         // for reporting (getTimeRemaining()/getNextTimeout())
+         // for reporting (getTimeRemaining()/getNextTimeout()) and for persisting
          // and not from the underlying jdk timer implementation.
-         if (isActive() && periode > 0)
+         // If it's a backlog task, then do not change the next timeout, since 
+         // a backlog task is "fire only once" task.
+         if (isActive() && periode > 0 && !this.backlog)
          {
             nextExpire += periode;
+            
+            TimerImpl.this.persistNextTimeout();
          }
          
          // If a retry thread is in progress, we don't want to allow another
@@ -581,6 +684,18 @@ public class TimerImpl implements javax.ejb.Timer, Synchronization
                }
             }
          }
+      }
+   }
+   
+   /**
+    * Persist the next timeout of the timer to the persistence store
+    */
+   private void persistNextTimeout()
+   {
+      PersistencePolicy persistencePolicy = this.timerService.getPersistencePolicy();
+      if (persistencePolicy != null && persistencePolicy instanceof PersistencePolicyExt)
+      {
+         ((PersistencePolicyExt) persistencePolicy).updateNextTimeout(this.timerId, this.timedObjectId, new Date(nextExpire));
       }
    }
 }

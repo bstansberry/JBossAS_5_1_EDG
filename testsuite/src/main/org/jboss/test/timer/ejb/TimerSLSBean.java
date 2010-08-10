@@ -21,22 +21,28 @@
  */
 package org.jboss.test.timer.ejb;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.List;
-import java.io.*;
+import java.util.Map;
 
+import javax.ejb.EJBException;
+import javax.ejb.NoSuchObjectLocalException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.ejb.TimedObject;
 import javax.ejb.Timer;
 import javax.ejb.TimerHandle;
 import javax.ejb.TimerService;
-import javax.ejb.EJBException;
-import javax.ejb.NoSuchObjectLocalException;
-import javax.management.MBeanServerFactory;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 
 import org.jboss.logging.Logger;
 import org.jboss.test.timer.interfaces.TimerSLSB;
@@ -65,6 +71,7 @@ public class TimerSLSBean
    // -------------------------------------------------------------------------
    private static HashMap timeoutCounts = new HashMap();
    private static Logger log = Logger.getLogger(TimerSLSBean.class);
+   private static final String TIMER_NAME_KEY = "TimerNameKey";
 
    // -------------------------------------------------------------------------
    // Members
@@ -83,9 +90,9 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public byte[] startSingleTimer(long pPeriod)
+   public void startSingleTimer(String timerName, long pPeriod)
    {
-      return startSingleTimer(pPeriod,"TimerSLSBean.startSingleTimer");
+      this.startSingleTimer(timerName, pPeriod,new HashMap());
    }
 
     /**
@@ -96,15 +103,18 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public byte[] startSingleTimer(long pPeriod, Serializable info)
+   public void startSingleTimer(String timerName, long pPeriod, HashMap info)
    {
       log.info("TimerSLSBean.startSingleTimer(), try to get a Timer Service from the Session Context");
       TimerService ts = context.getTimerService();
       long exp = System.currentTimeMillis() + pPeriod;
+      if (info == null)
+      {
+         info = new HashMap();
+      }
+      info.put(TIMER_NAME_KEY, timerName);
       Timer timer = ts.createTimer(new Date(exp), info);
       log.info("TimerSLSBean.startSingleTimer(), create a timer: "+timer);
-      byte[] handle = getHandle(timer);
-      return handle;
    }
 
    /**
@@ -116,9 +126,9 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public byte[] startTimer(long pPeriod)
+   public void startTimer(String timerName, long pPeriod)
    {
-      return startTimer(pPeriod, "TimerSLSBean.startTimer");
+      this.startTimer(timerName, pPeriod, new HashMap());
    }
 
      /**
@@ -130,42 +140,43 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public byte[] startTimer(long pPeriod, Serializable info)
+   public void startTimer(String timerName, long pPeriod, HashMap info)
    {
       log.info("TimerSLSBean.startTimer(), try to get a Timer Service from the Session Context");
       TimerService ts = context.getTimerService();
       long exp = System.currentTimeMillis() + pPeriod;
+      if (info == null)
+      {
+         info = new HashMap();
+      }
+      info.put(TIMER_NAME_KEY, timerName);
       Timer timer = ts.createTimer(new Date(exp), pPeriod, info);
       log.info("TimerSLSBean.startTimer(), create a timer: "+timer);
-      byte[] handle = getHandle(timer);
-      return handle;
    }
 
    /**
     * @ejb:interface-method view-type="remote"
     **/
-   public void stopTimer(byte[] handle)
+   public void stopTimer(String timerName)
    {
-      Timer timer = getTimer(handle);
+      Timer timer = getTimer(timerName);
       timer.cancel();
       log.info("TimerSLSBean.stopTimer(), create a timer: "+timer);
       synchronized( TimerSLSBean.class )
       {
-         Long key = getKey(handle);
-         timeoutCounts.remove(key);
+         timeoutCounts.remove(timerName);
       }
    }
 
    /**
     * @ejb:interface-method view-type="remote"
     **/
-   public int getTimeoutCount(byte[] handle)
+   public int getTimeoutCount(String timerName)
    {
       Integer count = null;
       try
       {
-         Long key = getKey(handle);         
-         count = (Integer) timeoutCounts.get(key);
+         count = (Integer) timeoutCounts.get(timerName);
       }
       catch(NoSuchObjectLocalException e)
       {
@@ -180,9 +191,9 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public Date getNextTimeout(byte[] handle)
+   public Date getNextTimeout(String timerName)
    {
-      Timer timer = getTimer(handle);
+      Timer timer = getTimer(timerName);
       return timer.getNextTimeout();
    }
 
@@ -191,9 +202,9 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public long getTimeRemaining(byte[] handle)
+   public long getTimeRemaining(String timerName)
    {
-      Timer timer = getTimer(handle);
+      Timer timer = getTimer(timerName);
       return timer.getTimeRemaining();
    }
 
@@ -202,10 +213,21 @@ public class TimerSLSBean
     *
     * @ejb:interface-method view-type="remote"
     **/
-   public Object getInfo(byte[] handle)
+   public Object getInfo(String timerName)
    {
-      Timer timer = getTimer(handle);
-      return timer.getInfo();
+      Timer timer = getTimer(timerName);
+      Serializable info = timer.getInfo();
+      // this shouldn't happen, because we always are dealing with HashMap in this
+      // testcase
+      if (!(info instanceof HashMap))
+      {
+         // just return the info, and let the testcase handle it
+         return info;
+      }
+      // remove the key/value pair that this bean had inserted
+      // so that the testcase is remains unaware of it
+      ((HashMap)info).remove(TIMER_NAME_KEY);
+      return info;
    }
 
    /**
@@ -221,22 +243,21 @@ public class TimerSLSBean
    public void ejbTimeout(Timer timer)
    {
       Integer count = null;
-      Long key = null;
+      String timerName = null; 
       synchronized( TimerSLSBean.class )
       {
          log.debug("ejbTimeout(): Timer State:" + timer);
-         byte[] handle = getHandle(timer);
-         key = getKey(handle);
-         count = (Integer) timeoutCounts.get(key);
+         timerName = this.getTimerName(timer);
+         count = (Integer) timeoutCounts.get(timerName);
          if( count == null )
             count = new Integer(1);
          else
             count = new Integer(1 + count.intValue());
-         timeoutCounts.put(key, count);
-         log.info("ejbTimeout(): count for timer handle " + key + " is " + count);
+         timeoutCounts.put(timerName, count);
+         log.info("ejbTimeout(): count for timerName " + timerName + " is " + count);
       }
 
-      log.info("ejbTimeout(), timer: " + timer+", key: "+key+", count: "+count);
+      log.info("ejbTimeout(), timer: " + timer+", name: "+timerName+", count: "+count);
 
       Object info = timer.getInfo();
       if(info instanceof Map) {
@@ -298,52 +319,41 @@ public class TimerSLSBean
    {
    }
 
-   private Long getKey(byte[] handle)
-   {
-      long key = 0;
-      for(int n = 0; n < handle.length; n ++)
-         key += handle[n];
-      log.info("HandleKey: "+key);
-      return new Long(key);
-   }
-   private byte[] getHandle(Timer timer)
+   private String getTimerName(Timer timer)
       throws EJBException
    {
-      try
+      Serializable info = timer.getInfo();
+      if (info != null && info instanceof HashMap)
       {
-         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-         ObjectOutputStream oos = new ObjectOutputStream(baos);
-         oos.writeObject(timer.getHandle());
-         oos.close();
-         byte[] handle = baos.toByteArray();
-         return handle;
+         String timerName = (String) ((HashMap) info).get(TIMER_NAME_KEY);
+         if (timerName != null)
+         {
+            return timerName;
+         }
       }
-      catch (Exception e)
-      {
-         throw new EJBException("Failed to get timer from handle", e);
-      }
+      throw new EJBException("Could not find internal timerName from timer " + timer);
    }
-   private Timer getTimer(byte[] handle)
+   
+   private Timer getTimer(String timerName)
       throws NoSuchObjectLocalException, EJBException
    {
-      try
+      TimerService ts = context.getTimerService();
+      Collection timers = ts.getTimers();
+      Iterator timersIterator = timers.iterator();
+      while (timersIterator.hasNext())
       {
-         ByteArrayInputStream bais = new ByteArrayInputStream(handle);
-         ObjectInputStream ois = new ObjectInputStream(bais);
-         TimerHandle th = null;
-         th = (TimerHandle) ois.readObject();
-         ois.close();
-         Timer timer = th.getTimer();
-         return timer;
+         Timer timer = (Timer) timersIterator.next();
+         Serializable info = timer.getInfo();
+         if (info != null && info instanceof HashMap)
+         {
+            String name = (String) ((HashMap) info).get(TIMER_NAME_KEY);
+            if (timerName.equals(name))
+            {
+               return timer;
+            }
+         }
       }
-      catch(NoSuchObjectLocalException e)
-      {
-         throw e;
-      }
-      catch (Exception e)
-      {
-         throw new EJBException("Failed to get timer from handle", e);
-      }
+      throw new NoSuchObjectLocalException("Timer with name " + timerName + " isn't available");
    }
 
    /**

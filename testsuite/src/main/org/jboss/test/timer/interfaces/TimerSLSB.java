@@ -21,7 +21,7 @@
  */
 package org.jboss.test.timer.interfaces;
 
-import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  * Remote interface for test/timer/TimerSLSB.
@@ -53,7 +53,7 @@ public interface TimerSLSB
     * This method uses an implementation defined default value for the timer info.
     * @param pPeriod Time that will elapse between now and the timed event in milliseconds
     */
-   public byte[] startSingleTimer( long pPeriod )
+   public void startSingleTimer( String timerName, long pPeriod )
       throws java.rmi.RemoteException;
 
    /**
@@ -62,7 +62,7 @@ public interface TimerSLSB
    * @param pPeriod Time that will elapse between now and the timed event in milliseconds
    * @param info an object to be used as the info for the timer.
    **/
-   public byte[] startSingleTimer(long pPeriod, Serializable info)
+   public void startSingleTimer(String timerName, long pPeriod, HashMap info)
       throws java.rmi.RemoteException;
 
    /**
@@ -70,7 +70,7 @@ public interface TimerSLSB
     * This method uses an implementation defined default value for the timer info.
     * @param pPeriod Time that will elapse between two events in milliseconds
     */
-   public byte[] startTimer( long pPeriod )
+   public void startTimer(String timerName, long pPeriod )
       throws java.rmi.RemoteException;
 
    /**
@@ -79,22 +79,22 @@ public interface TimerSLSB
     * @param pPeriod Time that will elapse between two events in milliseconds
     * @param info an object to be used as the info for the timer.
     */
-   public byte[] startTimer( long pPeriod, Serializable info )
+   public void startTimer(String timerName, long pPeriod, HashMap info )
       throws java.rmi.RemoteException;
 
-   public void stopTimer(byte[] handle)
+   public void stopTimer(String timerName)
       throws java.rmi.RemoteException;
 
-   public int getTimeoutCount(byte[] handle)
+   public int getTimeoutCount(String timerName)
       throws java.rmi.RemoteException;
 
-   public java.util.Date getNextTimeout(byte[] handle)
+   public java.util.Date getNextTimeout(String timerName)
       throws java.rmi.RemoteException;
 
-   public long getTimeRemaining(byte[] handle)
+   public long getTimeRemaining(String timerName)
       throws java.rmi.RemoteException;
 
-   public Object getInfo(byte[] handle)
+   public Object getInfo(String timerName)
       throws java.rmi.RemoteException;
 
    /**

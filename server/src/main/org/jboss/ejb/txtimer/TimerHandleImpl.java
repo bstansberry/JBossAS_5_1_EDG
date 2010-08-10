@@ -23,16 +23,17 @@ package org.jboss.ejb.txtimer;
 
 // $Id: TimerHandleImpl.java 81030 2008-11-14 12:59:42Z dimitris@jboss.org $
 
-import javax.ejb.EJBException;
-import javax.ejb.NoSuchObjectLocalException;
-import javax.ejb.Timer;
-import javax.ejb.TimerHandle;
-import javax.management.ObjectName;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
+
+import javax.ejb.EJBException;
+import javax.ejb.NoSuchObjectLocalException;
+import javax.ejb.Timer;
+import javax.ejb.TimerHandle;
+import javax.management.ObjectName;
 
 /**
  * An implementation of the TimerHandle
@@ -52,6 +53,7 @@ public class TimerHandleImpl implements TimerHandle
    private String timerId;
    private TimedObjectId timedObjectId;
    private Date firstTime;
+   private Date nextTimeout;
    private long periode;
    private Serializable info;
    private int hashCode;
@@ -64,18 +66,40 @@ public class TimerHandleImpl implements TimerHandle
       timerId = timer.getTimerId();
       timedObjectId = timer.getTimedObjectId();
       firstTime = timer.getFirstTime();
+      nextTimeout = new Date(timer.getNextExpire());
       periode = timer.getPeriode();
       info = timer.getInfoInternal();
    }
 
    /**
     * Construct a handle from individual parameters
+    * @deprecated Use {@link #TimerHandleImpl(String, TimedObjectId, Date, Date, long, Serializable)}
     */
+   @Deprecated
    TimerHandleImpl(String timerId, TimedObjectId timedObjectId, Date firstTime, long periode, Serializable info)
    {
       this.timerId = timerId;
       this.timedObjectId = timedObjectId;
       this.firstTime = firstTime;
+      this.periode = periode;
+      this.info = info;
+   }
+   
+   /**
+    * Constructs an timer handle from the passed parameters
+    * @param timerId
+    * @param timedObjectId
+    * @param firstTime
+    * @param nextTimeout
+    * @param periode
+    * @param info
+    */
+   TimerHandleImpl(String timerId, TimedObjectId timedObjectId, Date firstTime, Date nextTimeout, long periode, Serializable info)
+   {
+      this.timerId = timerId;
+      this.timedObjectId = timedObjectId;
+      this.firstTime = firstTime;
+      this.nextTimeout = nextTimeout;
       this.periode = periode;
       this.info = info;
    }
@@ -176,6 +200,11 @@ public class TimerHandleImpl implements TimerHandle
    public Serializable getInfo()
    {
       return info;
+   }
+   
+   public Date getNextTimeout()
+   {
+      return this.nextTimeout;
    }
 
    /**

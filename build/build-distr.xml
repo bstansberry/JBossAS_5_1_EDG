@@ -2363,6 +2363,8 @@
        <copy tofile="${install.all.conf}/jbossts-properties.xml"
              filtering="no" file="${project.thirdparty}/jboss/jbossts/resources/jbossts-properties.xml-forJTA"/>
 
+     	<antcall target="apply_JBM_XA_Recovery_patch"/>
+
        <!-- copy optional JBossTS binaries from thirdparty repo -->
        <mkdir dir="${install.examples}/transactions"/>
        <copy todir="${install.examples}/transactions" filtering="no">
@@ -2393,5 +2395,11 @@
     <mkdir dir="${install.server}/default/deploy/admin-console.war"/>
     <unjar src="${org.jboss.jopr.lib}/jopr-embedded-jbas5.war" dest="${install.server}/default/deploy/admin-console.war"/>
 
+  </target>
+
+  <target name="apply_JBM_XA_Recovery_patch" unless="build.ewp">
+     <echo> "apply JBM XA Recovery patch"</echo>
+     <patch patchFile="jbossas-5-jbm-xa-recovery.patch" dir="${install.all.conf}" strip="0">
+     </patch>
   </target>
 </project>

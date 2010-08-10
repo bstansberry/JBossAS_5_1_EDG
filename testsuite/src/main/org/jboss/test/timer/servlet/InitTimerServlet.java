@@ -45,7 +45,7 @@ import org.jboss.logging.Logger;
 public class InitTimerServlet extends HttpServlet
 {
    private static Logger log = Logger.getLogger(InitTimerServlet.class);
-   private static byte[] handle;
+   private static final String TIMER_NAME = "InitTimerServlet";
 
    /**
     * Start an ejb timer from within the init method.
@@ -63,7 +63,7 @@ public class InitTimerServlet extends HttpServlet
          InitialContext ctx = new InitialContext();
          TimerSLSBHome home = (TimerSLSBHome) ctx.lookup("java:/comp/env/ejb/TimerSLSBHome");
          TimerSLSB bean = home.create();
-         handle = bean.startTimer(60000);
+         bean.startTimer(TIMER_NAME,60000);
       }
       catch(Exception e)
       {
@@ -79,9 +79,9 @@ public class InitTimerServlet extends HttpServlet
          InitialContext ctx = new InitialContext();
          TimerSLSBHome home = (TimerSLSBHome) ctx.lookup("java:/comp/env/ejb/TimerSLSBHome");
          TimerSLSB bean = home.create();
-         int timeoutCount = bean.getTimeoutCount(handle);
-         Date nextTimeout = bean.getNextTimeout(handle);
-         long timeRemaining = bean.getTimeRemaining(handle);
+         int timeoutCount = bean.getTimeoutCount(TIMER_NAME);
+         Date nextTimeout = bean.getNextTimeout(TIMER_NAME);
+         long timeRemaining = bean.getTimeRemaining(TIMER_NAME);
          PrintWriter pw = response.getWriter();
          pw.println("<html><head><title>InitTimerServlet</title></head><body>");
          pw.println("<h1>Timer Info</h1>");

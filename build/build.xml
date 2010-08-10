@@ -782,6 +782,9 @@ Please ensure that build.properties exists in the build dir of the checkout tree
    <echo> "applying jbossas-5.patch in folder ${install.root}"</echo>
    <patch patchFile="jbossas-5.patch" dir="${install.root}" strip="0">
    </patch>
+   <echo> "applying jbossas-5-web-profile.patch in folder ${install.root}"</echo>
+   <patch patchFile="jbossas-5-web-profile.patch" dir="${install.root}" strip="0">
+   </patch>
   </target>
 
 
@@ -1038,10 +1041,10 @@ Please ensure that build.properties exists in the build dir of the checkout tree
         <exclude name="deploy/admin-console.war/**"/>
         <exclude name="deploy/management/**"/>
         <exclude name="deploy/cache-invalidation-service.xml"/>
-        <exclude name="deploy/mail-ra.rar"/>
+        <exclude name="deploy/mail-ra.rar/**"/>
         <exclude name="deploy/monitoring-service.xml"/>
         <exclude name="deploy/properties-service.xml"/>
-        <exclude name="deploy/quartz-ra.rar"/>
+        <exclude name="deploy/quartz-ra.rar/**"/>
         <exclude name="deploy/schedule-manager-service.xml"/>
         <exclude name="deploy/scheduler-service.xml"/>
         <exclude name="deploy/sqlexception-service.xml"/>
@@ -1081,8 +1084,8 @@ Please ensure that build.properties exists in the build dir of the checkout tree
         <exclude name="deploy/sqlexception-service.xml"/>
         <exclude name="deploy/monitoring-service.xml"/>
         <exclude name="deploy/properties-service.xml"/>
-        <exclude name="deploy/quartz-ra.rar"/>
-        <exclude name="deploy/jms-ra.rar"/>
+        <exclude name="deploy/quartz-ra.rar/**"/>
+        <exclude name="deploy/jms-ra.rar/**"/>
         <exclude name="deploy/jsr88-service.xml"/>
         <exclude name="deploy/jmx-remoting.sar"/>
         <exclude name="deploy/xnio-provider.jar"/>
@@ -1092,6 +1095,7 @@ Please ensure that build.properties exists in the build dir of the checkout tree
         <exclude name="deploy/scheduler-service.xml"/>
         <exclude name="deploy/schedule-manager-service.xml"/>
         <include name="deployers/**"/> 
+        <exclude name="deployers/messaging-definitions-jboss-beans.xml"/>
       </fileset>
       <fileset dir="${install.all}">
         <include name="deploy/cluster/jbossweb-cluster.aop"/>
@@ -1183,8 +1187,8 @@ Please ensure that build.properties exists in the build dir of the checkout tree
         <exclude name="deploy/sqlexception-service.xml"/>
         <exclude name="deploy/monitoring-service.xml"/>
         <exclude name="deploy/properties-service.xml"/>
-        <exclude name="deploy/quartz-ra.rar"/>
-        <exclude name="deploy/jms-ra.rar"/>
+        <exclude name="deploy/quartz-ra.rar/**"/>
+        <exclude name="deploy/jms-ra.rar/**"/>
         <exclude name="deploy/jsr88-service.xml"/>
         <exclude name="deploy/jmx-remoting.sar"/>
         <exclude name="deploy/xnio-provider.jar/**"/>

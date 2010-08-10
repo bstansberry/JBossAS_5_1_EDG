@@ -87,6 +87,9 @@ public class InternalManagedConnectionPool implements IdleConnectionRemovalSuppo
 
    /** Whether trace is enabled */
    private final boolean trace;
+   
+   /** The subpool */
+   private JBossManagedConnectionPool.SubPoolContext subPoolContext;
 
    /** Stats */
    private final Counter connectionCounter = new Counter();
@@ -114,6 +117,7 @@ public class InternalManagedConnectionPool implements IdleConnectionRemovalSuppo
     */
    protected InternalManagedConnectionPool(ManagedConnectionFactory mcf, ConnectionListenerFactory clf, Subject subject,
                                            ConnectionRequestInfo cri, PoolParams poolParams, JBossManagedConnectionPool jmcp,
+                                           JBossManagedConnectionPool.SubPoolContext subPoolContext,
                                            Logger log)
    {
       this.mcf = mcf;
@@ -124,6 +128,7 @@ public class InternalManagedConnectionPool implements IdleConnectionRemovalSuppo
       this.maxSize = poolParams.maxSize;
       this.jmcp = jmcp;
       this.log = log;
+      this.subPoolContext = subPoolContext;
       this.trace = log.isTraceEnabled();
       this.cls = new ArrayList(this.maxSize);
       this.permits = new Semaphore(this.maxSize, true);
@@ -833,6 +838,11 @@ public class InternalManagedConnectionPool implements IdleConnectionRemovalSuppo
          return maxSize;
       
       return poolParams.minSize;
+   }
+
+   public JBossManagedConnectionPool.SubPoolContext getSubPoolContext()
+   {
+      return subPoolContext;
    }
 
    public static class PoolParams

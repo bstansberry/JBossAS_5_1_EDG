@@ -14,5 +14,5 @@
 <import file="tests-jts.xml"/>
 <import file="tests-password-mask.xml"/>
 <import file="tests-crash-recovery.xml"/>
-
+<import file="tests-secured.xml"/>
 </project>

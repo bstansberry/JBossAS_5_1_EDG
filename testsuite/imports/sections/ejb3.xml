@@ -189,13 +189,24 @@
          <fileset dir="${build.resources}/ejb3/webservice" includes="**"/>
       </jar>
    </target>
+    
+	<target name="jbpapp4681" depends="compile">
+	      <mkdir dir="${build.lib}" />
+	      
+	      <jar destfile="${build.lib}/jbpapp4681.jar">
+	         <fileset dir="${build.classes}">
+	            <include name="org/jboss/test/ejb3/jbpapp4681/**" />
+	         </fileset>
+	      </jar>
+	</target>    
    
    <target name="_jars-ejb3" depends="ejb3-servlet,jbas6161,jbas6239,ejbthree1597,jbas5713,
       ejb3iiop,
       ejb3-webservice,
       jbpapp2260,
       jbpapp2473,
-      jbpapp3026
+      jbpapp3026,
+		jbpapp4681
       ">
       <mkdir dir="${build.lib}" />
 

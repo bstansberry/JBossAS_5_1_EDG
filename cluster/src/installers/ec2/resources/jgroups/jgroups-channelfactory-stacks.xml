@@ -195,7 +195,7 @@
            description="Stack optimized for the JBoss Messaging Data Channel">
         <config>
             <TCP singleton_name="jbm-data"
-                 start_port="${jboss.messaging.datachanneltcpport,jboss.jgroups.jbm_data.tcp_port:7900}"
+                 start_port="${jboss.messaging.datachanneltcpport:7900}"
                  loopback="true"
                  recv_buf_size="20000000"
                  send_buf_size="640000"

@@ -34,7 +34,6 @@ import java.util.Map;
 import javax.ejb.EJBException;
 import javax.ejb.Timer;
 import javax.ejb.TimerHandle;
-import javax.ejb.TimerService;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -53,7 +52,7 @@ import org.jboss.logging.Logger;
  * @version $Revision: 105909 $
  * @since 07-Apr-2004
  */
-public class TimerServiceImpl implements PersistentIdTimerService
+public class TimerServiceImpl implements TimerRestoringTimerService
 {
    // logging support
    private static Logger log = Logger.getLogger(TimerServiceImpl.class);
@@ -322,6 +321,42 @@ public class TimerServiceImpl implements PersistentIdTimerService
       return activeTimers;
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Timer restoreTimer(Date initialExpiration, long intervalDuration, Date nextExpiry, Serializable info,
+         String timerId) throws IllegalArgumentException, IllegalStateException, EJBException
+   {
+      if (initialExpiration == null)
+         throw new IllegalArgumentException("initial expiration is null");
+      if (intervalDuration < 0)
+         throw new IllegalArgumentException("interval duration is negative");
+      if (timerId == null)
+         throw new IllegalArgumentException("timerId is null");
+
+      try
+      {
+         TimerImpl timer = new TimerImpl(this, timerId, timedObjectId, timedObjectInvoker, info);
+         // store the timer info
+         persistencePolicy.insertTimer(timerId, timedObjectId, initialExpiration, intervalDuration, info);
+         // additionally, persist the next timeout too (can't store this next timeout date
+         // through the insert API, because it doesn't allow a way to pass the next timeout date). So
+         // this additional update
+         if (persistencePolicy instanceof PersistencePolicyExt)
+         {
+            ((PersistencePolicyExt) persistencePolicy).updateNextTimeout(timerId, timedObjectId, nextExpiry);
+         }
+         // now start the timer
+         timer.startTimer(initialExpiration, nextExpiry, intervalDuration);
+         return timer;
+      }
+      catch (Exception e)
+      {
+         throw new EJBException("Failed to restore timer", e);
+      }
+   }
+   
    // Package protected ---------------------------------------------
    
    /**
@@ -373,5 +408,10 @@ public class TimerServiceImpl implements PersistentIdTimerService
       {
          log.error("Retry timeout failed for timer: " + txtimer, e);
       }
+   }
+   
+   PersistencePolicy getPersistencePolicy()
+   {
+      return this.persistencePolicy;
    }
 }
