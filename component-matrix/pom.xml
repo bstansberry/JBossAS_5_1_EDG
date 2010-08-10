@@ -1717,14 +1717,6 @@
             <groupId>jgroups</groupId>
             <artifactId>jgroups</artifactId>            
           </exclusion>
-          <exclusion>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-server-memcached</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.infinispan</groupId>
-            <artifactId>infinispan-server-hotrod</artifactId>
-          </exclusion>
         </exclusions>
       </dependency>
       
