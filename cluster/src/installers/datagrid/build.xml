@@ -28,23 +28,31 @@
 
         <copy todir="${datagrid.conf}">
             <fileset dir="./conf"/>
-            <fileset dir="${jboss.home}/server/minimal/conf"/>
+            <fileset dir="${jboss.home}/server/web/conf" excludes="jbossts-properties.xml, jax-ws-catalog.xml"/>
         </copy>
 
+        <!-- Excluding the war file in this copy task since it needs to be unzipped/unwarred into server/datagrid/deploy -->
         <copy todir="${datagrid.deploy}">
-            <fileset dir="./deploy"/>
-            <fileset dir="${jboss.home}/server/minimal/deploy"/>
+            <fileset dir="./deploy" excludes="infinispan-server-rest.war"/>
+            <fileset dir="${jboss.home}/server/web/deploy" excludes="ejb*, mail*, xnio-provider.jar"/>
         </copy>
+
+        <unwar src="./deploy/infinispan-server-rest.war" dest="${datagrid.deploy}/infinispan-server-rest.war"/>
         
         <copy todir="${datagrid.deployers}">
             <fileset dir="./deployers"/>
-            <fileset dir="${jboss.home}/server/minimal/deployers"/>
+            <fileset dir="${jboss.home}/server/web/deployers" excludes="bsh.deployer, clustering-deployer-jboss-beans.xml, directory-deployer-jboss-beans.xml,
+                            ear-deployer-jboss-beans.xml, hibernate-deployer-jboss-beans.xml, jsr-deployer-jboss-beans.xml, logbridge-deployer-jboss-beans.xml"/>
         </copy>
 
         <copy todir="${datagrid.lib}">
             <fileset dir="./lib"/>
-            <fileset dir="${jboss.home}/server/minimal/lib"/>
+            <fileset dir="${jboss.home}/server/web/lib" excludes="hibernate-jbosscache2.jar, river.jar" />
         </copy>
+
+        <delete dir="${datagrid.deploy}/infinispan-server-rest.war" includes="infinispan-core*, log4j*, slf4j*, jgroups*, river*, scala-library*, jboss-*"/>
+
+        <delete dir="./infinispan-rest.war"/>
     </target>
 
 

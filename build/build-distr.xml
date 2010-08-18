@@ -1120,29 +1120,40 @@
     <property name="_datagrid.conf" value="${_datagrid.root}/conf"/>
     <property name="_datagrid.lib" value="${_datagrid.root}/lib"/>
 
-    <!-- ================================================================================================================================= -->
-    <!-- NOTE: Other jar files and configuration files defined by the MINIMAL profile will be copied when extras/datagrid/build.xml is run -->
-    <!-- ================================================================================================================================= -->
+    <!-- =====================================================================================  -->
+    <!-- NOTE: Other jar files and configuration files defined by the MINIMAL profile will be   -->
+    <!-- copied when extras/datagrid/build.xml is run                                           -->
+    <!-- =====================================================================================  -->
 
     <!-- Copy the jar files needed for the datagrid profile -->
     
     <copy todir="${_datagrid.lib}">
-         <fileset dir="${org.infinispan.lib}" excludes="*-sources.jar"></fileset>
-         <fileset dir="${org.jgroups.lib}" excludes="*-sources.jar"></fileset>
-         <fileset dir="${org.jboss.netty.lib}" excludes="*-sources.jar"></fileset>
-         <fileset dir="${apache.log4j.lib}" includes="log4j.jar"></fileset>
-         <fileset dir="${jboss.jnpserver.lib}" includes="*jnpserver.jar"></fileset>
+         <fileset dir="${org.infinispan.lib}" excludes="*-sources.jar, infinispan-server-rest.war" />
+         <fileset dir="${org.jgroups.lib}" excludes="*-sources.jar" />
+         <fileset dir="${org.jboss.netty.lib}" excludes="*-sources.jar" />
+         <fileset dir="${apache.log4j.lib}" includes="log4j.jar" />
+         <fileset dir="${jboss.jnpserver.lib}" includes="*jnpserver.jar" />
+         <fileset dir="${org.jboss.marshalling.lib}" excludes="*sources.jar"/>
+         <fileset dir="${org.scala.lang.lib}" includes="scala-library.jar"/>
     </copy>
 
     <!-- The configuration files below get built automatically into the extras/datagrid directory.
          We simply want to move them over into the config directory within extras/datagrid-->    
     <move todir="${_datagrid.conf}" overwrite="true">
         <fileset dir="${_datagrid.root}">
-            <include name="datagrid-jboss-beans.xml"/>
             <include name="datagrid-endpoint-memcached.properties"/>
             <include name="datagrid-endpoint-hotrod.properties"/>
+            <include name="datagrid-endpoint-rest.properties"/>
             <include name="infinispan-configuration.xml"/>
         </fileset>           
+    </move>
+
+    <move todir="${_datagrid.deploy}">
+        <fileset dir="${_datagrid.root}">
+            <include name="datagrid-jboss-beans.xml"/>
+        </fileset>
+
+        <fileset dir="${org.infinispan.lib}" includes="infinispan-server-rest.war" />
     </move>
 
   </target>

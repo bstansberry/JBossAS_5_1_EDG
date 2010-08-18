@@ -31,7 +31,6 @@
   <!-- Properties -->
   <properties>
     <version.apache.xalan>2.7.1.patch02</version.apache.xalan>
-    <version.org.infinispan>4.1.0.CR2</version.org.infinispan>
     <version.jacorb>2.3.1jboss.patch01</version.jacorb>
     <version.javax.faces>1.2_13</version.javax.faces>
     <version.jboss.jaxr>2.0.1</version.jboss.jaxr>
@@ -42,7 +41,7 @@
     <version.jboss.jbossws>3.1.2.SP7</version.jboss.jbossws>
     <version.jboss.jms-integration-tests>1.0.1.GA</version.jboss.jms-integration-tests>
     <version.jboss.messaging>1.4.6.GA_SP1</version.jboss.messaging>
-    <version.hornetq>2.1.1.Final</version.hornetq>
+    <version.hornetq>2.1.2.Final</version.hornetq>
     <version.jboss.web>2.1.9.GA</version.jboss.web>
     <version.jgroups>2.6.16.GA</version.jgroups>
     <version.junit>3.8.2</version.junit>
@@ -52,6 +51,7 @@
     <version.org.hibernate.entity.manager>3.4.0.GA_CP03</version.org.hibernate.entity.manager>
     <version.org.hibernate.validator>3.1.0.GA</version.org.hibernate.validator>
     <version.org.hibernate>3.3.2.GA_CP03</version.org.hibernate>
+    <version.org.infinispan>4.1.0.CR2</version.org.infinispan>
     <version.org.jboss.aop>2.1.6.GA</version.org.jboss.aop>
     <version.org.jboss.aspects.currentinvocation>1.0.1</version.org.jboss.aspects.currentinvocation>
     <version.org.jboss.aspects.remoting>1.0.1.GA</version.org.jboss.aspects.remoting>
@@ -67,7 +67,7 @@
     <version.org.jboss.cluster.server.api>1.1.3.Final</version.org.jboss.cluster.server.api>
     <version.org.jboss.common.core>2.2.16.GA</version.org.jboss.common.core>
     <version.org.jboss.deployers>2.0.10.GA</version.org.jboss.deployers>
-    <version.org.jboss.ejb3.bom>0.1.4</version.org.jboss.ejb3.bom>
+    <version.org.jboss.ejb3.bom>1.0.0</version.org.jboss.ejb3.bom>
     <version.org.jboss.integration>5.1.0.SP1</version.org.jboss.integration>
     <version.org.jboss.jbossxb>2.0.1.GA</version.org.jboss.jbossxb>
     <version.org.jboss.jopr>1.3.4.CR1</version.org.jboss.jopr>    
@@ -1021,7 +1021,7 @@
        <dependency>
          <groupId>org.jboss.netty</groupId>
          <artifactId>netty</artifactId>
-         <version>3.2.0.Final</version>
+         <version>3.2.1.Final</version>
        </dependency>
       
       <dependency>
@@ -1095,7 +1095,14 @@
         <artifactId>infinispan-server-hotrod</artifactId>
         <version>${version.org.infinispan}</version>
       </dependency>
-           
+      
+      <dependency>
+        <groupId>org.infinispan</groupId>
+        <artifactId>infinispan-server-rest</artifactId>
+        <version>${version.org.infinispan}</version>
+        <type>war</type>
+      </dependency>
+      
       <dependency>
         <groupId>joesnmp</groupId>
         <artifactId>joesnmp</artifactId>

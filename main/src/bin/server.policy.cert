@@ -45,6 +45,22 @@ grant codeBase "file:${jboss.server.home.dir}/deploy/quartz-ra.rar/-" {
  permission java.security.AllPermission;
 };
 
+grant codeBase "file:${jboss.server.home.dir}/tmp/embjopr/-"{
+ permission java.security.AllPermission;
+};
+
+grant codeBase "file:${jboss.server.home.dir}/deploy/admin-console.war/-" {
+ permission java.security.AllPermission;
+};
+
+grant codeBase "file:${jboss.server.home.dir}/tmp/embjopr/-"{
+ permission java.security.AllPermission;
+};
+
+grant codeBase "file:${jboss.server.home.dir}/deploy/admin-console.war/-" {
+ permission java.security.AllPermission;
+};
+
 grant codeBase "jar:file:${jboss.server.home.dir}/deploy/quartz-ra.rar!/quartz-ra.jar" {
  permission java.security.AllPermission;
 };
