@@ -34,7 +34,7 @@
         <!-- Excluding the war file in this copy task since it needs to be unzipped/unwarred into server/datagrid/deploy -->
         <copy todir="${datagrid.deploy}">
             <fileset dir="./deploy" excludes="infinispan-server-rest.war"/>
-            <fileset dir="${jboss.home}/server/web/deploy" excludes="ejb*, mail*, xnio-provider.jar"/>
+            <fileset dir="${jboss.home}/server/web/deploy" includes="jbossweb.sar, security*, hdscanner-jboss-beans.xml, jca-jboss-beans.xml, transaction-jboss-beans.xml"/>
         </copy>
 
         <unwar src="./deploy/infinispan-server-rest.war" dest="${datagrid.deploy}/infinispan-server-rest.war"/>
