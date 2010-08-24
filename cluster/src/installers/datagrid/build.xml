@@ -50,8 +50,27 @@
         
         <copy todir="${datagrid.deployers}">
             <fileset dir="./deployers"/>
-            <fileset dir="${jboss.home}/server/web/deployers" excludes="bsh.deployer, clustering-deployer-jboss-beans.xml, directory-deployer-jboss-beans.xml,
-                            ear-deployer-jboss-beans.xml, hibernate-deployer-jboss-beans.xml, jsr-deployer-jboss-beans.xml, logbridge-deployer-jboss-beans.xml"/>
+            <fileset dir="${jboss.home}/server/web/deployers" includes="alias-deployers-jboss-beans.xml, dependency-deployers-jboss-beans.xml, logbridge-jboss-beans.xml, metadata-deployer-jboss-beans.xml, security-deployer-jboss-beans.xml"/>
+        </copy>
+
+        <copy todir="${datagrid.deployers}/ejb3.deployer">
+            <fileset dir="${jboss.home}/server/web/deployers/ejb3.deployer" /> 
+        </copy>
+
+        <copy todir="${datagrid.deployers}/jboss-aop-jboss5.deployer">
+            <fileset dir="${jboss.home}/server/web/deployers/jboss-aop-jboss5.deployer" /> 
+        </copy>
+
+        <copy todir="${datagrid.deployers}/jboss-jca.deployer">
+            <fileset dir="${jboss.home}/server/web/deployers/jboss-jca.deployer" /> 
+        </copy>
+
+        <copy todir="${datagrid.deployers}/jboss-threads.deployer">
+            <fileset dir="${jboss.home}/server/web/deployers/jboss-threads.deployer" /> 
+        </copy>
+
+        <copy todir="${datagrid.deployers}/jbossweb.deployer">
+            <fileset dir="${jboss.home}/server/web/deployers/jbossweb.deployer" /> 
         </copy>
 
         <copy todir="${datagrid.lib}">
