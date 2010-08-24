@@ -728,6 +728,9 @@
             <include name="jms-ds.xml"/>
             <include name="destinations-service.xml"/>
         </fileset>
+        <fileset dir="${_module.output}/etc/deploy/clustered">
+           <include name="*-service.xml"/>
+        </fileset>
         <fileset dir="${jboss.messaging.resources}/">
             <include name="connection-factories-service.xml"/>
             <include name="remoting-bisocket-service.xml"/>
@@ -743,6 +746,9 @@
            <include name="*-service.xml"/>
            <include name="*-jboss-beans.xml"/>
            <include name="jms-ds.xml"/>
+        </fileset>
+        <fileset dir="${_module.output}/etc/deploy/non-clustered">
+           <include name="*-service.xml"/>
         </fileset>
         <fileset dir="${jboss.messaging.resources}/">
             <include name="connection-factories-service.xml"/>

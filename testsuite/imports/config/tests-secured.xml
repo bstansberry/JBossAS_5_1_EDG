@@ -18,15 +18,14 @@
   -->
    <target name="tests-secured" 
            description="Run tests on secured profiles">
-<!--     
-     <server:start name="default"/>
-       <run-junit junit.patternset="secured.mask.includes"/>
-     <server:stop name="default"/>
--->     
 
      <server:start name="all"/>
        <run-junit junit.patternset="secured.mask.includes"/>
      <server:stop name="all"/>
+
+     <server:start name="production"/>
+       <run-junit junit.patternset="secured.mask.includes"/>
+     <server:stop name="production"/>
 
   </target>
 </project>

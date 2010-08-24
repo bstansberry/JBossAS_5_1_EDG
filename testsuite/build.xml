@@ -4604,4 +4604,58 @@
    </target>
    
    <target name="check-build-type"><echo message="build.ewp is ${build.ewp} and version is ${version} and version.name is ${version.name}"/></target>
+	
+	<!-- Common Criteria Targets -->
+ 	 <target name="tests-cc-audit">
+ 	    <mkdir dir="${build.reports}"/>
+ 	    <mkdir dir="${build.testlog}"/>
+ 	    
+ 	    <create-config baseconf="default" newconf="cc-audit">
+ 	      <patternset>
+ 			<include name="conf/**"/>
+ 			<include name="deploy/**"/>
+ 			<include name="deployers/**"/>
+ 			<include name="lib/**"/>
+ 	      </patternset>
+ 	    </create-config>
+ 	    
+ 	    <!-- script tests which start their own servers -->
+ 	    <junit dir="${module.output}" printsummary="${junit.printsummary}" haltonerror="${junit.haltonerror}" haltonfailure="${junit.haltonfailure}" fork="${junit.fork}"
+ 		   timeout="${junit.timeout}" jvm="${junit.jvm}">
+ 	      
+ 	      <jvmarg value="${junit.jvm.options}"/>
+ 	      <!-- Used for JGroups -->
+ 	      <jvmarg value="-Dbind.address=${node0}"/>
+ 	      <sysproperty key="jboss.dist" value="${jboss.dist}"/>
+ 	      <sysproperty key="jbosstest.server.config" value="cc-audit"/>
+ 	      <sysproperty key="jbosstest.deploy.dir" file="${build.lib}"/>
+ 	      <sysproperty key="build.testlog" value="${build.testlog}"/>
+ 	      <sysproperty key="log4j.configuration" value="file:${build.resources}/log4j.xml"/>
+ 	      <sysproperty key="java.naming.provider.url" value="${node0.jndi.url}"/>
+ 	      <sysproperty key="jbosstest.server.host" value="${node0}"/>
+ 	      <sysproperty key="jbosstest.server.host.url" value="${node0.url}"/>
+ 	      <sysproperty key="java.net.preferIPv4Stack" value="${java.net.preferIPv4Stack}" />
+ 	      <sysproperty key="java.net.preferIPv6Addresses" value="${java.net.preferIPv6Addresses}" />
+ 	      <!-- Pass along any jbosstest.* system properties -->
+ 	      <syspropertyset>
+ 			<propertyref prefix="jbosstest."/>
+ 	      </syspropertyset>
+ 	      <classpath>
+ 			<pathelement location="${build.classes}"/>
+ 			<pathelement location="${build.resources}"/>
+ 			<path refid="tests.classpath"/>
+ 	      </classpath>
+ 	      
+ 	      <!--sysproperty key="jboss-junit-configuration" value="classloader-leak"/-->
+ 	      <formatter classname="org.jboss.ant.taskdefs.XMLJUnitMultipleResultFormatter" usefile="${junit.formatter.usefile}" extension="-security-audit.xml"/>
+ 	      
+ 	      <batchtest todir="${build.reports}" haltonerror="${junit.batchtest.haltonerror}" haltonfailure="${junit.batchtest.haltonfailure}" fork="${junit.batchtest.fork}">
+ 		
+ 		  <fileset dir="${build.classes}">
+ 	         <include name="**/test/security/audit/test/SecurityAuditTestCase.class"/>
+ 		  </fileset>
+ 	      </batchtest>
+ 	    </junit>
+ 	  </target>
+	
 </project>

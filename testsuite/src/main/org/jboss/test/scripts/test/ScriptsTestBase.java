@@ -68,6 +68,7 @@ public abstract class ScriptsTestBase extends JBossTestCase
 	LogFileAssertionChecker outputLogChecker = null ;
 	LogFileAssertionChecker bootLogChecker = null ;
 	LogFileAssertionChecker systemLogChecker = null ;
+	LogFileAssertionChecker auditLogChecker = null ;
 	
 	public ScriptsTestBase(String name)
 	{
@@ -85,6 +86,8 @@ public abstract class ScriptsTestBase extends JBossTestCase
 		outputLogChecker = new LogFileAssertionChecker(logDir + "/output.log") ;
 		bootLogChecker = new LogFileAssertionChecker(logDir + "/boot.log") ;
 		systemLogChecker = new LogFileAssertionChecker(logDir + "/system.log") ;
+		auditLogChecker = new LogFileAssertionChecker(logDir + "/audit.log") ;
+		
 	}
 
 	protected void setUp() throws Exception {
@@ -114,6 +117,9 @@ public abstract class ScriptsTestBase extends JBossTestCase
 	}
 	public LogFileAssertionChecker getSystemLogChecker() {
 		return systemLogChecker ;
+	}
+	public LogFileAssertionChecker getAuditLogChecker() {
+		return auditLogChecker ;
 	}
 	
 	/* location helpers 
@@ -235,7 +241,14 @@ public abstract class ScriptsTestBase extends JBossTestCase
 			Assert.fail(failureMessage) ;
 		}
 	}		
-			
+
+	public void assertOnAuditLog(String string, String failureMessage, boolean useCheckpoint, boolean resetCheckpoint) {
+		if (!auditLogChecker.isStringInLog(string, useCheckpoint, resetCheckpoint)) {
+			// assertion does not hold
+			Assert.fail(failureMessage) ;
+		}
+	}		
+	
 	/* check if there is a Tomcat connection to the server */
 	private static boolean isServerStarted(String host) throws MalformedURLException {
 		// URL to Tomcat 

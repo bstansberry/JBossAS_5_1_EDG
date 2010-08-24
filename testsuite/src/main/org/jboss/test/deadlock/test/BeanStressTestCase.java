@@ -495,11 +495,15 @@ public class BeanStressTestCase
    }
    */
 
-   public void testCleanup() throws Exception
-   {
-      // Restart the db pool
-      super.restartDBPool();
-   }
+    // JBPAPP-4758 -- disabled as this test is screwing up the server, without actually
+    // failing. AFAICT the only point of the test is to see if there is an exception after
+    // restarting DefaultDS, so if it's not detecting a broken server and is leaving the
+    // server broken for other tests, it's useless. 
+//   public void testCleanup() throws Exception
+//   {
+//      // Restart the db pool
+//      super.restartDBPool();
+//   }
 
    public static Test suite() throws Exception
    {

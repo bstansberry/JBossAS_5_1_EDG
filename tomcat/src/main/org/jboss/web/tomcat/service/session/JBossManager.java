@@ -1101,9 +1101,11 @@ public abstract class JBossManager
          }
          String hostName = ((Host) container_.getParent()).getName();
          hostName = (hostName == null) ? "localhost" : hostName;
+         String path = ((Context) container_).getPath();
+         path="".equals(path) ? "/" : path;
          ObjectName clusterName = new ObjectName(domain
                + ":type=Manager,host=" + hostName + ",path="
-               + ((Context) container_).getPath());
+               + path);
 
          if (server.isRegistered(clusterName))
          {

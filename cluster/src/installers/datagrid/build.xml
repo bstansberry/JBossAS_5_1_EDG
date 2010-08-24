@@ -50,7 +50,7 @@
             <fileset dir="${jboss.home}/server/web/lib" excludes="hibernate-jbosscache2.jar, river.jar" />
         </copy>
 
-        <delete dir="${datagrid.deploy}/infinispan-server-rest.war" includes="infinispan-core*, log4j*, slf4j*, jgroups*, river*, scala-library*, jboss-*"/>
+        <delete dir="${datagrid.deploy}/infinispan-server-rest.war/WEB-INF/lib/" includes="infinispan-core*, log4j*, slf4j*, jgroups*, river*, scala-library*, jboss-*"/>
 
         <delete dir="./infinispan-rest.war"/>
     </target>

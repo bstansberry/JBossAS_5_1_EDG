@@ -101,6 +101,19 @@ $Id: server-config.xml 106766 2010-07-15 19:31:19Z pferraro $
          <sysproperty key="jgroups.udp.ip_ttl" value="${jbosstest.udp.ip_ttl}" />
          <sysproperty key="xb.builder.useUnorderedSequence" value="true" />
       </server>
+<!--  Configured for tests-secured, full run.conf JAVA_OPTS are not needed
+-->
+      <server name="production" host="${node0}">
+         <jvmarg value="-Xms256m" />
+         <jvmarg value="-Xmx768m" />
+         <jvmarg value="-XX:MaxPermSize=256m" />
+         <jvmarg value="-XX:+HeapDumpOnOutOfMemoryError" />
+         <jvmarg value="-XX:-UseGCOverheadLimit" />
+         <sysproperty key="java.net.preferIPv4Stack" value="true" />
+         <sysproperty key="java.endorsed.dirs" value="${jboss.dist}/lib/endorsed" />
+         <sysproperty key="jgroups.udp.ip_ttl" value="${jbosstest.udp.ip_ttl}" />
+         <sysproperty key="xb.builder.useUnorderedSequence" value="true" />
+      </server>
       <server name="cluster-ec2" host="${node0}">
 <!--
          <jvmarg value="-agentlib:yjpagent" />
