@@ -162,10 +162,6 @@
                <key>jboss-app_5_0.dtd</key>
                <value>org.jboss.metadata.ear.jboss.JBoss50DTDAppMetaData</value>
             </entry>
-            <entry>
-               <key>jboss-app_5_0.xsd</key>
-               <value>org.jboss.metadata.ear.jboss.JBoss50AppMetaData</value>
-            </entry>
 
             <!-- ApplicationClientMetaData -->
             <entry>
@@ -191,10 +187,6 @@
             <!-- ApplicationClientMetaData -->
             <entry>
                <key>jboss-client</key>
-               <value>org.jboss.metadata.client.jboss.JBossClient5DTDMetaData</value>
-            </entry>
-            <entry>
-               <key>jboss-client_3_0.dtd</key>
                <value>org.jboss.metadata.client.jboss.JBossClient5DTDMetaData</value>
             </entry>
             <entry>
@@ -315,10 +307,6 @@
             <entry>
                <key>jboss-web_5_0.dtd</key>
                <value>org.jboss.metadata.web.jboss.JBoss50DTDWebMetaData</value>
-            </entry>
-            <entry>
-               <key>jboss-web_5_0.xsd</key>
-               <value>org.jboss.metadata.web.jboss.JBoss50WebMetaData</value>
             </entry>
             <!-- PersistenceMetaData -->
             <entry>
