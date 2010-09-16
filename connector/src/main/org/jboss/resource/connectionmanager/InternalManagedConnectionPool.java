@@ -621,7 +621,7 @@ public class InternalManagedConnectionPool implements IdleConnectionRemovalSuppo
    {
       synchronized (cls)
       {
-         return cls.size() == 0 && checkedOut.size() == 0;
+         return cls.size() == 0;
       }
    }
 

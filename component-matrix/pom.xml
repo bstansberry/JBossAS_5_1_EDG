@@ -76,7 +76,7 @@
     <version.org.jboss.logmanager>1.1.0.GA</version.org.jboss.logmanager>
     <version.org.jboss.man>2.1.1.SP2</version.org.jboss.man>
     <version.org.jboss.mdr>2.0.2.GA</version.org.jboss.mdr>
-    <version.org.jboss.metadata>1.0.5.GA</version.org.jboss.metadata>
+    <version.org.jboss.metadata>1.0.6.GA</version.org.jboss.metadata>
     <version.org.jboss.microcontainer>2.0.10.GA</version.org.jboss.microcontainer>
     <version.org.jboss.naming>5.0.3.GA</version.org.jboss.naming>
     <version.org.jboss.reflect>2.0.3.GA</version.org.jboss.reflect>

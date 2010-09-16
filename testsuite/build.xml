@@ -225,7 +225,7 @@
    <!-- the combined library classpath (for executing the testsuite) -->
    <path id="distribution.jars.library.classpath">
       <!-- path refid="apache.commons.classpath"/ -->
-      <pathelement path="${jboss.dist.common.lib}/commons-collections.jar" />
+      <pathelement path="${jboss.dist.server}/all/deploy/admin-console.war/WEB-INF/lib/commons-collections-3.2.jar" />
       <pathelement path="${jboss.dist.client}/commons-logging.jar" />
       <pathelement path="${apache.httpclient.lib}/commons-httpclient.jar" />
       <pathelement path="${apache.discovery.lib}/commons-discovery.jar" />

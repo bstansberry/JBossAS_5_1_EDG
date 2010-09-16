@@ -25,19 +25,18 @@
         <mkdir dir="${datagrid.conf}"/>
         <mkdir dir="${datagrid.deployers}"/>
         <mkdir dir="${datagrid.lib}"/>
+        <mkdir dir="${datagrid.deploy}/jbossweb.sar"/>
+        <mkdir dir="${datagrid.deploy}/jbossweb.sar/infinispan-server-rest.war"/>
 
         <copy todir="${datagrid.conf}">
             <fileset dir="./conf"/>
             <fileset dir="${jboss.home}/server/web/conf" excludes="jbossts-properties.xml, jax-ws-catalog.xml"/>
         </copy>
-
-        <!-- Excluding the war file in this copy task since it needs to be unzipped/unwarred into server/datagrid/deploy -->
-        <copy todir="${datagrid.deploy}">
-            <fileset dir="./deploy" excludes="infinispan-server-rest.war"/>
-            <fileset dir="${jboss.home}/server/web/deploy" includes="hdscanner-jboss-beans.xml, jca-jboss-beans.xml, transaction-jboss-beans.xml"/>
-
+        
+        <copy todir="${datagrid.deploy}/datagrid.sar">
+            <fileset dir="./deploy/datagrid.sar" excludes="infinispan-server-rest.war"/>
         </copy>
-
+        
         <copy todir="${datagrid.deploy}/jbossweb.sar">
             <fileset dir="${jboss.home}/server/web/deploy/jbossweb.sar"/>
         </copy>
@@ -45,8 +44,12 @@
         <copy todir="${datagrid.deploy}/security">
             <fileset dir="${jboss.home}/server/web/deploy/security"/>
         </copy>
+
+        <copy todir="${datagrid.deploy}">
+            <fileset dir="${jboss.home}/server/web/deploy" includes="jca-jboss-beans.xml, transaction-jboss-beans.xml"/>
+        </copy>
         
-        <unwar src="./deploy/infinispan-server-rest.war" dest="${datagrid.deploy}/infinispan-server-rest.war"/>
+        <unwar src="./deploy/datagrid.sar/infinispan-server-rest.war" dest="${datagrid.deploy}/datagrid.sar/infinispan-server-rest.war"/>
         
         <copy todir="${datagrid.deployers}">
             <fileset dir="./deployers"/>
@@ -74,13 +77,11 @@
         </copy>
 
         <copy todir="${datagrid.lib}">
-            <fileset dir="./lib"/>
             <fileset dir="${jboss.home}/server/web/lib" excludes="hibernate-jbosscache2.jar, river.jar" />
         </copy>
 
-        <delete dir="${datagrid.deploy}/infinispan-server-rest.war/WEB-INF/lib/" includes="infinispan-core*, log4j*, slf4j*, jgroups*, river*, scala-library*, jboss-*"/>
+        <delete dir="${datagrid.deploy}/datagrid.sar/infinispan-server-rest.war/WEB-INF/lib/" includes="infinispan-core*, log4j*, slf4j*, jgroups*, river*, scala-library*, jboss-*"/>
 
-        <delete dir="./infinispan-rest.war"/>
     </target>
 
 

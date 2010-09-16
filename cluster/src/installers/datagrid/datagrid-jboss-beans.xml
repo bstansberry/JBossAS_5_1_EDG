@@ -5,7 +5,7 @@
 	
 	<bean name="DefaultCacheManager" class="org.infinispan.manager.DefaultCacheManager">
 		<constructor>
-			<parameter class="java.lang.String">infinispan-configuration.xml</parameter>
+			<parameter class="java.lang.String">META-INF/infinispan-configuration.xml</parameter>
 		</constructor>							
 	</bean>
 	

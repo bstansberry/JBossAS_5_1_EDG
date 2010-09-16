@@ -52,7 +52,9 @@
          <param name="CONFIG_TYPE" value="clustered"/>
       </antcall>
 
-
+   	   <!--we need to disable guest security for production-->
+   	   <replace file="${jboss_home}/server/production/conf/props/hornetq-users.properties" token="guest=guest" value="#guest=guest"/>
+   	   <replace file="${jboss_home}/server/production/conf/props/hornetq-roles.properties" token="guest=guest" value="#guest=guest"/> 
    </target>
 
    <target name="removeCommon">

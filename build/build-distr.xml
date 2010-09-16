@@ -1126,14 +1126,19 @@
     <property name="_datagrid.conf" value="${_datagrid.root}/conf"/>
     <property name="_datagrid.lib" value="${_datagrid.root}/lib"/>
 
+    <!-- Build the directory structure for the datagrid.sar directory -->
+    <mkdir dir="${_datagrid.deploy}/datagrid.sar"/>
+    <mkdir dir="${_datagrid.deploy}/datagrid.sar/META-INF"/>
+    <property name="_deploy.sar" value="${_datagrid.deploy}/datagrid.sar" />
+
     <!-- =====================================================================================  -->
-    <!-- NOTE: Other jar files and configuration files defined by the MINIMAL profile will be   -->
+    <!-- NOTE: Other jar files and configuration files defined by the WEB profile will be   -->
     <!-- copied when extras/datagrid/build.xml is run                                           -->
     <!-- =====================================================================================  -->
 
     <!-- Copy the jar files needed for the datagrid profile -->
     
-    <copy todir="${_datagrid.lib}">
+    <copy todir="${_deploy.sar}">
          <fileset dir="${org.infinispan.lib}" excludes="*-sources.jar, infinispan-server-rest.war" />
          <fileset dir="${org.jgroups.lib}" excludes="*-sources.jar" />
          <fileset dir="${org.jboss.netty.lib}" excludes="*-sources.jar" />
@@ -1144,24 +1149,21 @@
     </copy>
 
     <!-- The configuration files below get built automatically into the extras/datagrid directory.
-         We simply want to move them over into the config directory within extras/datagrid-->    
-    <move todir="${_datagrid.conf}" overwrite="true">
+         These need to get moved into the META-INF directory of the exploded sar-->    
+    <move todir="${_deploy.sar}/META-INF">
         <fileset dir="${_datagrid.root}">
             <include name="datagrid-endpoint-memcached.properties"/>
             <include name="datagrid-endpoint-hotrod.properties"/>
             <include name="datagrid-endpoint-rest.properties"/>
-            <include name="infinispan-configuration.xml"/>
-        </fileset>           
-    </move>
-
-    <move todir="${_datagrid.deploy}">
-        <fileset dir="${_datagrid.root}">
             <include name="datagrid-jboss-beans.xml"/>
+            <include name="infinispan-configuration.xml"/>
         </fileset>
-
-        <fileset dir="${org.infinispan.lib}" includes="infinispan-server-rest.war" />
     </move>
-
+    
+    <copy todir="${_deploy.sar}">
+        <fileset dir="${org.infinispan.lib}" includes="infinispan-server-rest.war" />
+    </copy>
+    
   </target>
 
   <target name="_module-cluster-all" depends="_module-cluster-most">
