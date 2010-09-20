@@ -16,11 +16,32 @@
 				<map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String" name="">
 					<entry>
 						<key>infinispan.server.host</key>
-						<value>127.0.0.1</value>
+						<!--<value>127.0.0.1</value>-->
+						<value>
+					      <value-factory bean="ServiceBindingManager"
+					        method="getStringBinding">
+					        <parameter>HotRodServer</parameter>
+					        <parameter><null /></parameter>
+					        <parameter><null/></parameter>
+					        <parameter>${jboss.bind.address}</parameter>
+					        <parameter>11311</parameter>
+					      </value-factory>
+					   </value>
 					</entry>
 					<entry>
 						<key>infinispan.server.port</key>
-						<value>11311</value>
+						<!--<value>11311</value>-->
+						<value>
+					      <value-factory bean="ServiceBindingManager"
+					        method="getIntBinding">
+					        <parameter>HotRodServer</parameter>
+					        <parameter>
+					          <null />
+					        </parameter>
+					        <parameter>${jboss.bind.address}</parameter>
+					        <parameter>11311</parameter>
+					      </value-factory>
+					   </value>
 					</entry>
 				</map>								
 			</parameter>			
@@ -36,11 +57,30 @@
 				<map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
 					<entry>
 						<key>infinispan.server.host</key>
-						<value>127.0.0.1</value>
+						<!--<value>127.0.0.1</value>-->
+						<value>
+					      <value-factory bean="ServiceBindingManager"
+					        method="getStringBinding">
+					        <parameter>MemcachedServer</parameter>
+					        <parameter><null /></parameter>
+					        <parameter><null/></parameter>
+					        <parameter>${jboss.bind.address}</parameter>
+					        <parameter>11211</parameter>
+					      </value-factory>
+					   </value>
 					</entry>
 					<entry>
 						<key>infinispan.server.port</key>
-						<value>11211</value>
+						<!--<value>11311</value>-->
+						<value>
+					      <value-factory bean="ServiceBindingManager"
+					        method="getIntBinding">
+					        <parameter>MemcachedServer</parameter>
+					        <parameter><null /></parameter>
+					        <parameter>${jboss.bind.address}</parameter>
+					        <parameter>11211</parameter>
+					      </value-factory>
+					   </value>
 					</entry>
 				</map>				
 			</parameter>			
