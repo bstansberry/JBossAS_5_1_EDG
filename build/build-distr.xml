@@ -1157,6 +1157,7 @@
             <include name="datagrid-endpoint-rest.properties"/>
             <include name="datagrid-jboss-beans.xml"/>
             <include name="infinispan-configuration.xml"/>
+            <include name="jboss-structure.xml"/>
         </fileset>
     </move>
     
