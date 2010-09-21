@@ -12,11 +12,11 @@
 	
 	<bean name="HotRodServer" class="org.infinispan.server.hotrod.HotRodServer">
 		<install method="start">
+			<!--
 			<parameter class="java.util.Properties">
 				<map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String" name="">
 					<entry>
 						<key>infinispan.server.host</key>
-						<!--<value>127.0.0.1</value>-->
 						<value>
 					      <value-factory bean="ServiceBindingManager"
 					        method="getStringBinding">
@@ -30,7 +30,6 @@
 					</entry>
 					<entry>
 						<key>infinispan.server.port</key>
-						<!--<value>11311</value>-->
 						<value>
 					      <value-factory bean="ServiceBindingManager"
 					        method="getIntBinding">
@@ -44,8 +43,8 @@
 					   </value>
 					</entry>
 				</map>								
-			</parameter>			
-			<!-- <parameter class="java.lang.String">datagrid-endpoint-hotrod.properties</parameter> -->
+			</parameter>	-->		
+			<parameter class="java.lang.String">META-INF/datagrid-endpoint-hotrod.properties</parameter>
 			<parameter class="org.infinispan.manager.EmbeddedCacheManager"><inject bean="DefaultCacheManager" /></parameter>			
 		</install>				
 	</bean>
@@ -53,11 +52,11 @@
 
 	<bean name="MemcachedServer" class="org.infinispan.server.memcached.MemcachedServer">
 		<install method="start">
+			<!--
 			<parameter class="java.util.Properties">
 				<map class="java.util.Properties" keyClass="java.lang.String" valueClass="java.lang.String">
 					<entry>
 						<key>infinispan.server.host</key>
-						<!--<value>127.0.0.1</value>-->
 						<value>
 					      <value-factory bean="ServiceBindingManager"
 					        method="getStringBinding">
@@ -71,7 +70,6 @@
 					</entry>
 					<entry>
 						<key>infinispan.server.port</key>
-						<!--<value>11311</value>-->
 						<value>
 					      <value-factory bean="ServiceBindingManager"
 					        method="getIntBinding">
@@ -83,8 +81,8 @@
 					   </value>
 					</entry>
 				</map>				
-			</parameter>			
-			<!-- <parameter class="java.lang.String">datagrid-endpoint-memcached.properties</parameter> -->
+			</parameter>	-->		
+			<parameter class="java.lang.String">META-INF/datagrid-endpoint-memcached.properties</parameter>
 			<parameter class="org.infinispan.manager.EmbeddedCacheManager"><inject bean="DefaultCacheManager" /></parameter>			
 		</install>				
 	</bean>

@@ -570,6 +570,25 @@
                <property name="fixedHostName">true</property>
                <property name="fixedPort">true</property>
             </bean>
+            
+            <!-- ******** Infinispan Tech Preview's $JBOSS_HOME/server/datagrid/deploy/datagrid.sar ******** -->
+
+            <bean class="org.jboss.services.binding.ServiceBindingMetadata">
+               <property name="serviceName">Infinispan</property>
+               <property name="bindingName">HotRodServer</property>
+               <property name="hostName">${jboss.bind.address:127.0.0.1}</property>
+               <property name="port">11216</property>
+               <property name="description">Socket on which Infinispan's HotRod server listens</property>
+            </bean>
+
+            <bean class="org.jboss.services.binding.ServiceBindingMetadata">
+               <property name="serviceName">Infinispan</property>
+               <property name="bindingName">Memcached</property>
+               <property name="hostName">${jboss.bind.address:127.0.0.1}</property>
+               <property name="port">11211</property>
+               <property name="description">Socket on which Infinispan's memcached server listens</property>
+            </bean>
+
            
          </set>
          </parameter>
@@ -942,7 +961,54 @@
                      </parameter>
                   </constructor>
                </bean>
-              
+               <!-- Infinispan Tech Preview sockets -->
+	           <bean class="org.jboss.services.binding.SystemPropertyBinding">
+	              <constructor>
+	                 <parameter>jboss.infinispan.hotrod.server.host</parameter>
+	                 <parameter class="java.lang.String">
+	                    <value-factory bean="ServiceBindingManager" method="getStringBinding">
+	                         <parameter>Infinispan</parameter>
+	                         <parameter>HotRodServer</parameter>
+                             <parameter><null/></parameter>
+	                    </value-factory>
+	                 </parameter>
+	              </constructor>
+	           </bean>	
+	           <bean class="org.jboss.services.binding.SystemPropertyBinding">
+	              <constructor>
+	                 <parameter>jboss.infinispan.hotrod.server.port</parameter>
+	                 <parameter class="int">
+	                    <value-factory bean="ServiceBindingManager" method="getIntBinding">
+	                         <parameter>Infinispan</parameter>
+	                         <parameter>HotRodServer</parameter>
+	                    </value-factory>
+	                 </parameter>
+	              </constructor>
+	           </bean>
+	           <bean class="org.jboss.services.binding.SystemPropertyBinding">
+	              <constructor>
+	                 <parameter>jboss.infinispan.memcached.server.host</parameter>
+	                 <parameter class="java.lang.String">
+	                    <value-factory bean="ServiceBindingManager" method="getStringBinding">
+	                         <parameter>Infinispan</parameter>
+	                         <parameter>Memcached</parameter>
+                             <parameter><null/></parameter>
+	                    </value-factory>
+	                 </parameter>
+	              </constructor>
+	           </bean>	
+	           <bean class="org.jboss.services.binding.SystemPropertyBinding">
+	              <constructor>
+	                 <parameter>jboss.infinispan.memcached.server.port</parameter>
+	                 <parameter class="int">
+	                    <value-factory bean="ServiceBindingManager" method="getIntBinding">
+	                         <parameter>Infinispan</parameter>
+	                         <parameter>Memcached</parameter>
+	                    </value-factory>
+	                 </parameter>
+	              </constructor>
+	           </bean>        
+	      
             </set>
          </parameter>
       </constructor>
