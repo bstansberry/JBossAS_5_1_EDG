@@ -51,7 +51,7 @@
     <version.org.hibernate.entity.manager>3.4.0.GA_CP03</version.org.hibernate.entity.manager>
     <version.org.hibernate.validator>3.1.0.GA</version.org.hibernate.validator>
     <version.org.hibernate>3.3.2.GA_CP03</version.org.hibernate>
-    <version.org.infinispan>4.1.0.CR2</version.org.infinispan>
+    <version.org.infinispan>4.1.0.FINAL</version.org.infinispan>
     <version.org.jboss.aop>2.1.6.GA_CP01</version.org.jboss.aop>
     <version.org.jboss.aspects.currentinvocation>1.0.1</version.org.jboss.aspects.currentinvocation>
     <version.org.jboss.aspects.remoting>1.0.1.GA</version.org.jboss.aspects.remoting>
